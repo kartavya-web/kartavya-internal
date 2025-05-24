@@ -1,6 +1,9 @@
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://www.KartavyasponsorDatabase.com",
+  "http://localhost:3500",
+  "https://kartavya-internal.onrender.com",
+  "https://kartavya-internal-backend.onrender.com",
+  "https://kartavya-internal-frontend.onrender.com",
 ];
 
 module.exports = allowedOrigins;

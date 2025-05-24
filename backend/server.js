@@ -13,7 +13,7 @@ const { logEvents } = require("./middleware/logger.js");
 const { checkToken, checkVerified } = require("./middleware.js");
 const PORT = process.env.PORT || 3500;
 
-console.log(process.env.NODE_ENV);
+app.use(express.static(path.join(__dirname, 'dist')));
 
 connectDB();
 
