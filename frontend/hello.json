@@ -1,0 +1,13 @@
+{
+  "user": { "$oid": "6797b538702bd44e7da764f4" },
+  "name": "Sample Name",
+  "donations": [
+    {
+      "donationId": { "$oid": "679bbe64100a5ecc13b97481" },
+      "date": { "$date": "2025-03-01T00:00:00.000Z" },
+      "numChild": 0
+    }
+  ],
+  "createdAt": { "$date": "2025-03-01T00:00:00.000Z" },
+  "updatedAt": { "$date": "2025-03-01T00:00:00.000Z" }
+}
