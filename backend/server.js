@@ -47,6 +47,10 @@ app.use(
 
 app.use(Errorhandler);
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
 mongoose.connection.once("open", () => {
   console.log("connection to MongoDB");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
