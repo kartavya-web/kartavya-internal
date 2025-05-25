@@ -18,22 +18,22 @@ const EnterStudentDetails = () => {
   const token = localStorage.getItem("token");
 
   const [formData, setFormData] = useState({
-    studentName: "student",
+    studentName: "",
     rollNumber: "",
-    gender: "Male",
-    currentSession: "2024-25",
+    gender: "",
+    currentSession: "2025-26",
     reportCard: "",
-    dob: `2025-01-27T00:00:00.000+00:00`,
-    studentClass: "6",
-    school: "NIOS",
-    centre: "C5",
-    contactNumber: "1234567890",
-    fathersName: "abcd",
-    fathersOccupation: "abcd",
-    mothersName: "abcd",
-    mothersOccupation: "abcd",
-    address: "Dhanbad",
-    annualIncome: 100000,
+    dob: "",
+    studentClass: "",
+    school: "",
+    centre: "",
+    contactNumber: "",
+    fathersName: "",
+    fathersOccupation: "",
+    mothersName: "",
+    mothersOccupation: "Housewife",
+    address: "",
+    annualIncome: 0,
     activeStatus: true,
     aadhar: false,
     domicile: false,
@@ -111,7 +111,7 @@ const EnterStudentDetails = () => {
   };
 
   return (
-    <div className="w-screen h-screen bg-[radial-gradient(ellipse_at_center,rgba(222,80,85,0.4),transparent),radial-gradient(ellipse_at_top_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_top_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0))]">
+    <div className="w-screen h-screen overflow-x-hidden bg-[radial-gradient(ellipse_at_center,rgba(222,80,85,0.4),transparent),radial-gradient(ellipse_at_top_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_top_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0))]">
       <HeaderForInputStudentDetails />
       <div className="flex flex-col w-full xl:flex-row xl:h-[calc(100vh-7rem)]">
         <div className="flex justify-center items-center w-full h-[500px] xl:w-2/5 xl:h-full">
@@ -122,10 +122,10 @@ const EnterStudentDetails = () => {
           />
         </div>
 
-        <div className="relative w-full h-[500px] xl:w-3/5 xl:h-full overflow-hidden">
+        <div className="relative w-full overflow-hidden xl:w-3/5 xl:h-full">
           {/* Animation Class */}
           <div
-            className={`transition-transform duration-500 ease-in-out absolute inset-0 ${
+            className={`transition-transform duration-500 ease-in-out absolute inset-0 overflow-hidden ${
               isFirstPage ? "translate-x-0" : "-translate-x-full"
             }`}
           >
@@ -137,12 +137,12 @@ const EnterStudentDetails = () => {
             />
           </div>
           <div
-            className={`transition-transform duration-500 ease-in-out absolute inset-0 ${
+            className={`transition-transform duration-500 ease-in-out absolute inset-0 overflow-hidden ${
               isFirstPage ? "translate-x-full" : "translate-x-0"
             }`}
           >
             {/* Student Details Page 2 */}
-            <div className="flex flex-col items-center w-full h-full pt-5">
+            <div className="flex flex-col items-center w-full h-full pt-5 overflow-y-scroll">
               <div className="progress1 flex justify-center items-center w-full h-7">
                 <img
                   src="/progress2.png"
@@ -222,7 +222,7 @@ const EnterStudentDetails = () => {
                 </div>
               </div>
 
-              <div className="flex items-center w-full pt-24">
+              <div className="flex items-center w-full py-10">
                 <div className="flex justify-center w-[90%] pl-[2.5%] pr-[2.5%] gap-10">
                   <Button
                     onClick={handleClick}

@@ -74,11 +74,6 @@ const StudentProfile = () => {
     setStudentDataChanged(true);
   };
 
-  const temp = [ 
-    {name: 'Amit'},
-    {name: 'Rahul'},
-  ]
-
   // update student data
   const handleSaveChanges = async (e) => {
     e.preventDefault();
@@ -311,7 +306,6 @@ const StudentProfile = () => {
                   name={"centre"}
                   options={[
                     { value: "C1" },
-                    { value: "C2" },
                     { value: "C3" },
                     { value: "C5" },
                     { value: "Anganwadi" },
@@ -709,7 +703,7 @@ const StudentProfile = () => {
               </label>
             </div>
 
-            <div className="w-full flex items-center h-9 px-[2.5%] mt-5">
+            {/* <div className="w-full flex items-center h-9 px-[2.5%] mt-5">
               <div className="w-full flex flex-col gap-2 mt-2">
                 {temp.map((item, idx) => (
                   <div key={idx} className="flex justify-between">
@@ -718,7 +712,7 @@ const StudentProfile = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}

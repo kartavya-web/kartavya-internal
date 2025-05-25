@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
   return (
-    <div className="flex flex-col items-center w-full h-full pt-5">
+    <div className="flex flex-col items-center w-full h-full pt-5 overflow-y-scroll">
       <div className="progress1 flex justify-center items-center w-full h-7">
         <img
           src="/progress1.png"
@@ -100,7 +100,6 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
               name={"centre"}
               options={[
                 { value: "C1" },
-                { value: "C2" },
                 { value: "C3" },
                 { value: "C5" },
                 { value: "Anganwadi" },
@@ -207,7 +206,7 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
           </div>
         </div>
 
-        <div className="flex items-center w-full pt-2">
+        <div className="flex items-center w-full my-10">
           <div className="flex justify-center w-[90%] pl-[6%] pr-[2.5%]">
             <Button onClick={handleClick} className="w-[150px] p-2 rounded-lg">
               Next
