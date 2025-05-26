@@ -31,14 +31,14 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     relevantCertificate,
   } = req.body;
 
-  console.log(req.body, "body");  
+  console.log(req.body, "body ❤️❤️");  
 
   if (!studentName || !gender || !dob || !fathersName || !centre) {
     return res
       .status(400)
       .json({ message: "Please fill the compulsory information" });
   }
-  console.log(school, studentClass, "school and class"); 
+
   if ((!school && studentClass) || (school && !studentClass)) {
     return res
       .status(400)
@@ -53,6 +53,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
 
   //Generate new Roll Number
   const lastStudent = await Student.findOne().sort({ rollNumber: -1 });
+  console.log(lastStudent, "last student found");
 
   // Extract the last sequence number and increment it
   let lastSequenceNumber = lastStudent
@@ -60,14 +61,17 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     : 1;
   let newSequenceNumber = lastSequenceNumber + 1;
 
+  console.log(newSequenceNumber, "new sequence number");
+
   // Generate the new roll number
   let newRollNumber = `K/DHN/${newSequenceNumber}`;
+  console.log(newRollNumber, "new roll number");
 
   const studentObject = {
     rollNumber: newRollNumber,
-    studentName : `student-${newSequenceNumber}`, // to add students fast
+    studentName,
     gender,
-    dob : new Date(),
+    dob,
     school,
     class: studentClass,
     fathersName,
@@ -87,6 +91,8 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     singleParent,
     relevantCertificate,
   };
+
+  console.log(studentObject, "student object");
 
   const stud = await Student.create(studentObject);
   if (stud) {

@@ -68,6 +68,7 @@ const EnterStudentDetails = () => {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     try {
+      console.log("Submitting form data:");
       const formDataToSend = new FormData();
 
       for (const key in formData) {
@@ -103,6 +104,10 @@ const EnterStudentDetails = () => {
       }
 
       toast.success("Form submitted successfully!");
+
+      // wait for 1 second before refreshing the page
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       navigate(0);
     } catch (e) {
       toast.error(`Error submitting form: ${e.message}`);

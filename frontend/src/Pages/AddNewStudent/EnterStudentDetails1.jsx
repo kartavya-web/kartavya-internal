@@ -82,7 +82,7 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
           <div className="w-full xl:w-1/2">
             <InputComponent
               title={"Class of Student"}
-              name={"class"}
+              name={"studentClass"}
               type={"text"}
               placeholder={"Class"}
               handleInputChange={handleInputChange}
