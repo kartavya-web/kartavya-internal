@@ -94,7 +94,7 @@ const UserSchema = new Schema({
     unique: true,
     sparse: true,
   },
-});
+}, { timestamps: true });
 
 UserSchema.methods.setPassword = function (password) {
   this.salt = crypto.randomBytes(16).toString("hex");

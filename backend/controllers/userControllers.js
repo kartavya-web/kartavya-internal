@@ -15,11 +15,11 @@ const loginUser = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-    // if (!user.validatePassword(password)) {
-    //   return res.status(401).json({
-    //     message: "Invalid credentials",
-    //   });
-    // }
+    if (!user.validatePassword(password)) {
+      return res.status(401).json({
+        message: "Invalid credentials",
+      });
+    }
 
     const sanitizedUser = {
       username: user.username,

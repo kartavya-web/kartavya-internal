@@ -656,7 +656,7 @@ const StudentProfile = () => {
               </div>
             </div> */}
 
-            <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
+            {/* <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
               <label
                 htmlFor="sponserName"
                 className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -673,9 +673,9 @@ const StudentProfile = () => {
                   onChange={handleInputChange}
                 />
               </div>
-            </div>
+            </div> */}
 
-            <div className="flex items-center w-full h-9 px-[2.5%]">
+            {/* <div className="flex items-center w-full h-9 px-[2.5%]">
               <label
                 htmlFor="amountBySponsor"
                 className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -692,16 +692,16 @@ const StudentProfile = () => {
                   onChange={handleInputChange}
                 />
               </div>
-            </div>
+            </div> */}
 
-            <div className="flex items-center w-full h-9 px-[2.5%]">
+            {/* <div className="flex items-center w-full h-9 px-[2.5%]">
               <label
                 htmlFor="amountBySponsor"
                 className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Sponsors
               </label>
-            </div>
+            </div> */}
 
             {/* <div className="w-full flex items-center h-9 px-[2.5%] mt-5">
               <div className="w-full flex flex-col gap-2 mt-2">
