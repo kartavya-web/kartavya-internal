@@ -52,7 +52,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
   }
 
   //Generate new Roll Number
-  const lastStudent = await Student.findOne().sort({ rollNumber: -1 });
+  const lastStudent = await Student.findOne().sort({ _id : -1 });
   console.log(lastStudent, "last student found");
 
   // Extract the last sequence number and increment it
