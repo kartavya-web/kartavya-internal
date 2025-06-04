@@ -8,6 +8,14 @@ import Loader from "@/components/Loader";
 
 const Classes = [
   {
+    value: "LKG",
+    label: "LKG",
+  },
+  {
+    value: "UKG",
+    label: "UKG",
+  },
+  {
     value: "1",
     label: "1",
   },
@@ -59,7 +67,6 @@ const Classes = [
 
 const Centres = [
   { label: "C1", value: "C1" },
-  { label: "C2", value: "C2" },
   { label: "C3", value: "C3" },
   { label: "C5", value: "C5" },
   { label: "Anganwadi", value: "Anganwadi" },
@@ -84,6 +91,14 @@ const Schools = [
   { label: "Physics Wallah", value: "Physics Wallah" },
   { label: "Akash", value: "Akash" },
   { label: "Ram Krishna Public School", value: "Ram Krishna Public School" },
+  { label: "Sunshine Children Academy", value: "Sunshine Children Academy" },
+  { label: "Kendriya Vidyalaya No.1", value: "Kendriya Vidyalaya No.1" },
+  { label: "Kendriya Vidyalaya No.2", value: "Kendriya Vidyalaya No.2" },
+  { label: "DY Patil", value: "DY Patil" },
+  { label: "DPS Hirak", value: "DPS Hirak" },
+  { label: "Dr. JK Sinha Memorial (ISL)", value: "Dr. JK Sinha Memorial (ISL)" },
+  { label: "ISL Jharia", value: "ISL Jharia" },
+  { label: "St. Xavier", value: "St. Xavier" }
 ];
 
 const ActiveStatus = [

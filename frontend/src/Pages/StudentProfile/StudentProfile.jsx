@@ -17,6 +17,7 @@ import Loader from "@/components/Loader";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import TextareaComponent from "@/components/Form/TextareaComponent";
+import { Link } from "react-router-dom";
 
 const StudentProfile = () => {
   const navigate = useNavigate();
@@ -144,9 +145,11 @@ const StudentProfile = () => {
   return (
     <div className="flex select-none">
       <div className="sticky top-0 flex flex-col gap-10 sidebar w-[21%] h-screen pl-[10px] pr-[10px] border-r border-r-[#DDE4EB]">
-        <div className="logo w-full">
-          <img src="/logos.png" alt="logos" className="object-contain" />
-        </div>
+        <Link to="/">
+          <div className="logo w-full">
+            <img src="/logos.png" alt="logos" className="object-contain" />
+          </div>
+        </Link>
 
         <div className="basic-details">
           <div className="filters flex flex-col items-center p-[10px]">

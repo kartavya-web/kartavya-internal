@@ -126,6 +126,14 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
                 { value: "Physics Wallah" },
                 { value: "Akash" },
                 { value: "Ram Krishna Public School" },
+                { value: "Sunshine Children Academy"},
+                { value: "Kendriya Vidyalaya No.1" }, 
+                { value: "Kendriya Vidyalaya No.2" },
+                { value: "DY Patil" },
+                { value: "DPS Hirak" },
+                { value: "Dr. JK Sinha Memorial (ISL)" },
+                { value: "ISL Jharia" },
+                { value: "St. Xavier" }
               ]}
               handleInputChange={handleInputChange}
               value={formData.school}
