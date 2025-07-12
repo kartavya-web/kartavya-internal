@@ -21,6 +21,12 @@ const loginUser = async (req, res) => {
       });
     }
 
+    if(user.role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied. Admins only.",
+      });
+    }
+
     const sanitizedUser = {
       username: user.username,
       name: user.name,
@@ -56,6 +62,31 @@ const loginUser = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await Users.findById(userId).select("-password -__v");
+    
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "User retrieved successfully",
+      user,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      name: err.name,
+      error: err.message,
+    });
+  }
+}
+
 module.exports = {
   loginUser,
+  getUserById
 };

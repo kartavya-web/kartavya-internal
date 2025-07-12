@@ -3,13 +3,15 @@ const ChildSponsorMap = require("./../models/ChildSponsorMapSchema");
 const mongoose = require("mongoose");
 const Student = require("./../models/Student");
 const User = require("./../models/User");
+const { getUserById } = require("../controllers/userControllers");
+const generateEmailTemplate = require("../Utils/mailTemplate");
+const { sendEmail } = require("../Utils/mailer");
 
 // @desc Get all Donations
 // @route GET/api/allotment/
 // @access Private
 const getVerifiedDonations = asyncHandler(async (req, res) => {
   const verifiedDonations = await ChildSponsorMap.find({}).lean();
-  console.log("verifiedDonations 🥲🥲", verifiedDonations);
   res.json(verifiedDonations);
 });
 
@@ -27,7 +29,7 @@ const getChildTobeAlloted = asyncHandler(async (req, res) => {
         {
           $multiply: ["$annualFees", { $divide: ["$sponsorshipPercent", 100] }],
         },
-        { $multiply: [{ $size: "$sponsorId" }, 8000] },
+        { $multiply: [{ $size: "$sponsorId" }, 8500] },
       ],
     },
     sponsorId: { $not: { $in: [sponsorid] } },
@@ -36,7 +38,6 @@ const getChildTobeAlloted = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: students });
 });
 
-// Transaction Controller
 const performCATransaction = async (sponsorId, studentId) => {
   const session = await mongoose.startSession();
   console.log(sponsorId, "sponsorId 👍👍");
@@ -108,19 +109,51 @@ const performCATransaction = async (sponsorId, studentId) => {
   }
 };
 
+const sendAllotmentEmail = async (sponsor, student) => {
+  const emailTemplate = generateEmailTemplate({
+    title: "Child Allotment Confirmation - Kartavya IIT(ISM)",
+    message: `Hello ${sponsor.name}, Thank you for choosing to sponsor a child. We have allotted you a child to support through our platform.`,
+    highlightBox: true,
+    highlightContent: `Please login to your account to view the child's details.`,
+    buttonLink: "https://kartavya.org",
+    buttonText: "Login to Kartavya",
+    additionalContent: `
+    <p>We truly appreciate your continued support towards the education of underprivileged children.</p>
+    <p>The details of the newly allotted child are updated on the website. We will keep you updated on their progress.</p>
+    <p>If you have any questions regarding this allotment, feel free to reach out to our team.</p>
+`,
+  });
+  await sendEmail({
+    to: sponsor.email,
+    subject: "Kartavya - Child Allotment Confirmation",
+    html: emailTemplate,
+    text: `You have been allotted a child to sponsor:\n
+    Thank you for supporting education through Kartavya.`,
+  });
+  console.log("Allotment email sent successfully!");
+};
+
 // @desc Allot Student to the Sponsor
 // @route PATCH /api/allotment/allot
 // @access Private
 const allotChild = asyncHandler(async (req, res) => {
-  const { sponsorId, studentId } = req.body; // Removed unnecessary `await`
+  const { sponsorId, studentId } = req.body;
 
   try {
     await performCATransaction(sponsorId, studentId);
+    const sponsor = await getUserById(sponsorId);
+    if (!sponsor) {
+      return res.status(404).json({ message: "Sponsor not found" });
+    }
+    const student = await Student.findById(studentId).lean();
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    await sendAllotmentEmail(sponsor, student);
     res.status(200).json({ message: "Child allotted successfully!" });
   } catch (error) {
     console.error("Allotment failed:", error);
-
-    // Provide a more structured error response
     res.status(400).json({
       message:
         error.message || "An error occurred during the allotment process.",
@@ -128,9 +161,8 @@ const allotChild = asyncHandler(async (req, res) => {
   }
 });
 
-
 const deAllotChild = asyncHandler(async (req, res) => {
-  const { sponsorId, studentId } = req.body; 
+  const { sponsorId, studentId } = req.body;
 
   const sponsor = await User.findById(sponsorId).lean();
   if (!sponsor) {
@@ -138,9 +170,9 @@ const deAllotChild = asyncHandler(async (req, res) => {
   }
 
   const student = await Student.findById(studentId).lean();
-  if(!student) {
+  if (!student) {
     return res.status(404).json({ message: "Student not found" });
-  } 
+  }
 
   sponsor.sponsoredStudents = sponsor.sponsoredStudents.filter(
     (sId) => sId.toString() !== studentId.toString()
@@ -154,13 +186,51 @@ const deAllotChild = asyncHandler(async (req, res) => {
   return res.status(200).json({
     message: "Child de-allotted successfully!",
   });
-})
+});
+
+// @desc Add Donation to ChildSponsorMap
+// @route POST /api/allotment/add-donation
+// @access Private
+const addDonationsToCSM = asyncHandler(async (req, res) => {
+  const { user, name, donations } = req.body;
+
+  if (!user || !name || !donations || donations.length === 0) {
+    return res.status(400).json({ message: "Missing required fields." });
+  }
+
+  const rawDonation = donations[0];
+
+  const donationToAdd = {
+    donationId: rawDonation.donationId,
+    date: new Date(rawDonation.date),
+    numChild: rawDonation.numChild || 0,
+  };
+
+  let existingMap = await ChildSponsorMap.findOne({ user });
+
+  if (existingMap) {
+    existingMap.donations.push(donationToAdd);
+    await existingMap.save();
+    return res.status(200).json({ message: "Donation added to existing sponsor map." });
+  } else {
+    const newMap = new ChildSponsorMap({
+      user,
+      name,
+      donations: [donationToAdd],
+    });
+
+    await newMap.save();
+    return res.status(201).json({ message: "New sponsor map created and donation added." });
+  }
+});
+
 
 module.exports = {
   getVerifiedDonations,
   getChildTobeAlloted,
   allotChild,
-  deAllotChild
+  deAllotChild,
+  addDonationsToCSM,
 };
 
 // donation_id = 679bbe64100a5ecc13b97481

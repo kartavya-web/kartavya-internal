@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import TextareaComponent from "@/components/Form/TextareaComponent";
 import { Link } from "react-router-dom";
+import { Centres, Gender, Schools } from "@/constants/constants";
 
 const StudentProfile = () => {
   const navigate = useNavigate();
@@ -237,11 +238,7 @@ const StudentProfile = () => {
                 <SelectComponent
                   title={"Gender"}
                   name={"gender"}
-                  options={[
-                    { value: "Male" },
-                    { value: "Female" },
-                    { value: "Other" },
-                  ]}
+                  options={Gender}
                   handleInputChange={handleInputChange}
                   value={studentData?.gender}
                 />
@@ -307,12 +304,7 @@ const StudentProfile = () => {
                 <SelectComponent
                   title={"Center of Student"}
                   name={"centre"}
-                  options={[
-                    { value: "C1" },
-                    { value: "C3" },
-                    { value: "C5" },
-                    { value: "Anganwadi" },
-                  ]}
+                  options={Centres}
                   handleInputChange={handleInputChange}
                   value={studentData?.centre}
                 />
@@ -321,21 +313,7 @@ const StudentProfile = () => {
                 <SelectComponent
                   title={"School of Student"}
                   name={"school"}
-                  options={[
-                    { value: "Education Academy" },
-                    { value: "Vidiya Public School" },
-                    { value: "Vidya Bharti" },
-                    { value: "Lucious Public School" },
-                    { value: "Tagore Academy" },
-                    { value: "Saraswati Vidya Niketan" },
-                    { value: "Dhanbad Vikas Vidyalaya" },
-                    { value: "NIOS" },
-                    { value: "ISL Jhariya" },
-                    { value: "Dhanbad Public School" },
-                    { value: "Physics Wallah" },
-                    { value: "Akash" },
-                    { value: "Ram Krishna Public School" },
-                  ]}
+                  options={Schools}
                   handleInputChange={handleInputChange}
                   value={studentData?.school}
                 />

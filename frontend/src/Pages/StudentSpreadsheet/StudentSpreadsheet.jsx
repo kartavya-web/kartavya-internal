@@ -5,106 +5,11 @@ import { toast } from "react-toastify";
 import FilterComponent from "@/components/Filters/DropdownMenu";
 import { useNavigate } from "react-router-dom";
 import Loader from "@/components/Loader";
-
-const Classes = [
-  {
-    value: "LKG",
-    label: "LKG",
-  },
-  {
-    value: "UKG",
-    label: "UKG",
-  },
-  {
-    value: "1",
-    label: "1",
-  },
-  {
-    value: "2",
-    label: "2",
-  },
-  {
-    value: "3",
-    label: "3",
-  },
-  {
-    value: "4",
-    label: "4",
-  },
-  {
-    value: "5",
-    label: "5",
-  },
-  {
-    value: "6",
-    label: "6",
-  },
-  {
-    value: "7",
-    label: "7",
-  },
-  {
-    value: "8",
-    label: "8",
-  },
-  {
-    value: "9",
-    label: "9",
-  },
-  {
-    value: "10",
-    label: "10",
-  },
-  {
-    value: "11",
-    label: "11",
-  },
-  {
-    value: "12",
-    label: "12",
-  },
-];
-
-const Centres = [
-  { label: "C1", value: "C1" },
-  { label: "C3", value: "C3" },
-  { label: "C5", value: "C5" },
-  { label: "Anganwadi", value: "Anganwadi" },
-];
-
-const SponsorshipStatus = [
-  { label: "Yes", value: true },
-  { label: "No", value: false },
-];
-
-const Schools = [
-  { label: "Education Academy", value: "Education Academy" },
-  { label: "Vidiya Public School", value: "Vidiya Public School" },
-  { label: "Vidya Bharti", value: "Vidya Bharti" },
-  { label: "Lucious Public School", value: "Lucious Public School" },
-  { label: "Tagore Academy", value: "Tagore Academy" },
-  { label: "Saraswati Vidya Niketan", value: "Saraswati Vidya Niketan" },
-  { label: "Dhanbad Vikas Vidyalaya", value: "Dhanbad Vikas Vidyalaya" },
-  { label: "NIOS", value: "NIOS" },
-  { label: "ISL Jhariya", value: "ISL Jhariya" },
-  { label: "Dhanbad Public School", value: "Dhanbad Public School" },
-  { label: "Physics Wallah", value: "Physics Wallah" },
-  { label: "Akash", value: "Akash" },
-  { label: "Ram Krishna Public School", value: "Ram Krishna Public School" },
-  { label: "Sunshine Children Academy", value: "Sunshine Children Academy" },
-  { label: "Kendriya Vidyalaya No.1", value: "Kendriya Vidyalaya No.1" },
-  { label: "Kendriya Vidyalaya No.2", value: "Kendriya Vidyalaya No.2" },
-  { label: "DY Patil", value: "DY Patil" },
-  { label: "DPS Hirak", value: "DPS Hirak" },
-  { label: "Dr. JK Sinha Memorial (ISL)", value: "Dr. JK Sinha Memorial (ISL)" },
-  { label: "ISL Jharia", value: "ISL Jharia" },
-  { label: "St. Xavier", value: "St. Xavier" }
-];
-
-const ActiveStatus = [
-  { label: "Active", value: true },
-  { label: "Inactive", value: false },
-];
+import { Classes } from "@/constants/constants";
+import { Centres } from "@/constants/constants";
+import { SponsorshipStatus } from "@/constants/constants";
+import { ActiveStatus } from "@/constants/constants";
+import { Schools } from "@/constants/constants";
 
 const StudentSpreadsheet = () => {
   const navigate = useNavigate();
@@ -113,12 +18,15 @@ const StudentSpreadsheet = () => {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
-  const [filters, setFilters] = useState({
-    centre: [],
-    class: [],
-    sponsorshipStatus: [],
-    activeStatus: [],
-    school: [],
+  const [filters, setFilters] = useState(() => {
+    const saved = localStorage.getItem("studentFilters");
+    return saved ? JSON.parse(saved) : {
+      centre: [],
+      class: [],
+      sponsorshipStatus: [],
+      activeStatus: [],
+      school: [],
+    };
   });
 
   useEffect(() => {
@@ -139,11 +47,6 @@ const StudentSpreadsheet = () => {
           return;
         }
         setStudents(data);
-
-        // function to simulate an artificial delay
-        // const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-        // await delay(3000);
-
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -159,8 +62,17 @@ const StudentSpreadsheet = () => {
 
   useEffect(() => {
     const data = filterData();
+    console.log('filters', filters)
     setFilteredData(data);
   }, [filters]);
+
+  const handleFilterChange = (name, queries) => {
+    setFilters((prev) => {
+      const updated = { ...prev, [name]: queries };
+      localStorage.setItem("studentFilters", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const filterData = () => {
     return students?.filter((student) => {
@@ -175,13 +87,6 @@ const StudentSpreadsheet = () => {
       }
       return true;
     });
-  };
-
-  const handleFilterChange = (name, queries) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: queries,
-    }));
   };
 
   if (loading) return <Loader />;
@@ -202,6 +107,7 @@ const StudentSpreadsheet = () => {
               filterName="class"
               filterOptions={Classes}
               handleFilterChange={handleFilterChange}
+              selectedOptions={filters.class}
             />
 
             <FilterComponent
@@ -209,6 +115,7 @@ const StudentSpreadsheet = () => {
               filterName="centre"
               filterOptions={Centres}
               handleFilterChange={handleFilterChange}
+              selectedOptions={filters.centre}
             />
 
             <FilterComponent
@@ -216,6 +123,7 @@ const StudentSpreadsheet = () => {
               filterName="sponsorshipStatus"
               filterOptions={SponsorshipStatus}
               handleFilterChange={handleFilterChange}
+              selectedOptions={filters.sponsorshipStatus}
             />
 
             <FilterComponent
@@ -223,6 +131,7 @@ const StudentSpreadsheet = () => {
               filterName="school"
               filterOptions={Schools}
               handleFilterChange={handleFilterChange}
+              selectedOptions={filters.school}
             />
 
             <FilterComponent
@@ -230,6 +139,7 @@ const StudentSpreadsheet = () => {
               filterName="activeStatus"
               filterOptions={ActiveStatus}
               handleFilterChange={handleFilterChange}
+              selectedOptions={filters.activeStatus}
             />
 
             {/* 

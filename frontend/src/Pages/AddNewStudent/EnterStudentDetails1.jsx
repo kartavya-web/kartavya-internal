@@ -2,6 +2,7 @@ import React from "react";
 import InputComponent from "@/components/Form/InputComponent";
 import SelectComponent from "@/components/Form/SelectComponent";
 import { Button } from "@/components/ui/button";
+import { Centres, Gender, Schools } from "@/constants/constants";
 
 const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
   return (
@@ -23,7 +24,7 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
               title={"Name of Student"}
               name={"studentName"}
               type={"text"}
-              value={formData.studentName}
+              value={formData.studentName} 
               placeholder={"Name"}
               handleInputChange={handleInputChange}
             />
@@ -32,11 +33,7 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
             <SelectComponent
               title={"Gender"}
               name={"gender"}
-              options={[
-                { value: "Male" },
-                { value: "Female" },
-                { value: "Other" },
-              ]}
+              options={Gender}
               handleInputChange={handleInputChange}
               value={formData.gender}
             />
@@ -98,12 +95,7 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
             <SelectComponent
               title={"Centre of Student"}
               name={"centre"}
-              options={[
-                { value: "C1" },
-                { value: "C3" },
-                { value: "C5" },
-                { value: "Anganwadi" },
-              ]}
+              options={Centres}
               handleInputChange={handleInputChange}
               value={formData.centre}
             />
@@ -112,29 +104,7 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
             <SelectComponent
               title={"School of Student"}
               name={"school"}
-              options={[
-                { value: "Education Academy" },
-                { value: "Vidiya Public School" },
-                { value: "Vidya Bharti" },
-                { value: "Lucious Public School" },
-                { value: "Tagore Academy" },
-                { value: "Saraswati Vidya Niketan" },
-                { value: "Dhanbad Vikas Vidyalaya" },
-                { value: "NIOS" },
-                { value: "ISL Jhariya" },
-                { value: "Dhanbad Public School" },
-                { value: "Physics Wallah" },
-                { value: "Akash" },
-                { value: "Ram Krishna Public School" },
-                { value: "Sunshine Children Academy"},
-                { value: "Kendriya Vidyalaya No.1" }, 
-                { value: "Kendriya Vidyalaya No.2" },
-                { value: "DY Patil" },
-                { value: "DPS Hirak" },
-                { value: "Dr. JK Sinha Memorial (ISL)" },
-                { value: "ISL Jharia" },
-                { value: "St. Xavier" }
-              ]}
+              options={Schools}
               handleInputChange={handleInputChange}
               value={formData.school}
             />

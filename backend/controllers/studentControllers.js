@@ -102,16 +102,8 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
 // @access Private
 const getAllStudents = asyncHandler(async (req, res) => {
   const students = await Student.find()
-    .select(
-      "-fathersName -fathersOccupation -mothersName -mothersOccupation -gender -annualIncome -sponsor -sponsorshipPercent -currSession -contactNumber"
-    )
+    .select("studentName rollNumber class centre activeStatus sponsorshipStatus school")
     .lean();
-
-  // if no student is there then return empty array -> change made by Amit Bhagat
-
-  // if (!students?.length) {
-  //   return res.status(400).json({ message: "No Student found" });
-  // }
 
   res.json(students);
 });

@@ -15,11 +15,16 @@ export default function MultipleClassSelect({
   filterName,
   handleFilterChange,
   filterOptions,
+  selectedOptions = []
 }) {
   const inputRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState([]);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    setSelected(selectedOptions);
+  }, []);
 
   useEffect(() => {
     handleFilterChange(filterName, selected);

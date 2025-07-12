@@ -15,6 +15,7 @@ import HomePage from "./Pages/HomePage/HomePage";
 import AllotmentHomePage from "./Pages/SponsorAllotment/AllotmentHomePage";
 import AllotChild from "./Pages/SponsorAllotment/AllotChild";
 import { SponsorProvider } from "./context/SponsorContext";
+import AddDonationsToCSM from "./Pages/SponsorAllotment/AddDonationsToCSM";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       <Route path="/student-spreadsheet" element={<StudentSpreadsheet />} />
       <Route path="/allotment" element={<AllotmentHomePage />} />
       <Route path="/allotment/action" element={<AllotChild />} />
+      <Route path="/allotment/addDonationsToCSM" element={<AddDonationsToCSM />} />
 
       <Route path="/hello" element={<Sample />} />
 
