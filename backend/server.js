@@ -40,8 +40,8 @@ app.use(
 // csa -> child sponsor allotment
 app.use(
   "/api/allotment",
-  // checkToken,
-  // checkVerified,
+  checkToken,
+  checkVerified,
   require("./routes/csaRoutes.js")
 );
 

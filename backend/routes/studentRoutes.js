@@ -36,6 +36,8 @@ router
     })
   );
 
+router.get("/get-base64-image", studentController.getBase64Image);
+
 router
   .route("/:rollNumber")
   .get(studentController.getStudentByRoll)

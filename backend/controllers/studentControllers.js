@@ -1,8 +1,8 @@
-const User = require("../models/User");
 const Student = require("../models/Student");
-const Sponsors = require("../models/Child_Sponsors");
 const azure = require("../azureStorage");
 const asyncHandler = require("express-async-handler");
+const { get } = require("https");
+const { get: httpGet } = require("http");
 
 // @desc Create New Student
 // @route POST/Students
@@ -361,6 +361,45 @@ const deleteStudent = asyncHandler(async (req, res) => {
   res.json({ message: "Student Deleted" });
 });
 
+// @desc Get base64 image from URL
+// @route GET /students/get-base64-image?url=IMAGE_URL
+// @access Private/Public (as per your usage)
+const getBase64Image = asyncHandler(async (req, res) => {
+  const imageUrl = req.query.url;
+  if (!imageUrl) return res.status(400).send("Missing image URL");
+
+  const fetchBase64FromUrl = (url) => {
+    return new Promise((resolve, reject) => {
+      const client = url.startsWith("https") ? get : httpGet;
+
+      client(url, (resp) => {
+        if (resp.statusCode !== 200) {
+          reject(new Error(`HTTP Status Code: ${resp.statusCode}`));
+          return;
+        }
+
+        const contentType = resp.headers["content-type"] || "image/jpeg";
+        const chunks = [];
+
+        resp.on("data", (chunk) => chunks.push(chunk));
+        resp.on("end", () => {
+          const buffer = Buffer.concat(chunks);
+          const base64 = buffer.toString("base64");
+          resolve(`data:${contentType};base64,${base64}`);
+        });
+      }).on("error", reject);
+    });
+  };
+
+  try {
+    const base64 = await fetchBase64FromUrl(imageUrl);
+    res.send(base64);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Failed to fetch image");
+  }
+});
+
 module.exports = {
   addNewStudent,
   getAllStudents,
@@ -369,4 +408,5 @@ module.exports = {
   deleteStudent,
   updateResult,
   updateProfilePhoto,
+  getBase64Image
 };

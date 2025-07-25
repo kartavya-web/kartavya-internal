@@ -1,4 +1,4 @@
-import { useState } from "react"; // Import useState for managing local state
+import { useEffect, useState } from "react"; // Import useState for managing local state
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,6 +15,37 @@ import { format, parseISO } from "date-fns";
 
 const DialogForPdfPreview = ({ studentData }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // converting the external image URL to base64 for embedding in the PDF
+  // This is done to ensure the image is correctly embedded in the PDF because of CORS issues.
+  const [base64Img, setBase64Img] = useState("");
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const setBase64Image = async () => {
+      const profileUrl = studentData?.profilePhoto;
+      if (!profileUrl) return;
+
+      try {
+        const res = await fetch(
+          `/api/students/get-base64-image?url=${encodeURIComponent(profileUrl)}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!res.ok) throw new Error("Request failed");
+        const base64 = await res.text();
+        setBase64Img(base64);
+      } catch (err) {
+        console.error("Failed to convert image to base64", err);
+      }
+    };
+    setBase64Image();
+  }, [studentData, token]);
 
   const handleClick = async () => {
     try {
@@ -112,8 +143,7 @@ const DialogForPdfPreview = ({ studentData }) => {
 
                   <div className="hero2 w-[30%] mr-5">
                     <img
-                      // src="/profile.png"
-                      src={studentData?.profilePhoto || "/student.jpg"}
+                      src={base64Img || "/student.jpg"}
                       alt="profile-photo"
                       className="w-full h-auto object-contain"
                     />
