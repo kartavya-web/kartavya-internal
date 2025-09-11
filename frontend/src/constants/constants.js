@@ -61,6 +61,7 @@ export const Centres = [
   { label: "C1", value: "C1" },
   { label: "C3", value: "C3" },
   { label: "C5", value: "C5" },
+  { label: "C6", value: "C6" },
   { label: "Anganwadi", value: "Anganwadi" },
 ];
 
