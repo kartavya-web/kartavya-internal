@@ -1,32 +1,30 @@
 require("dotenv").config();
 const express = require("express");
-const app = express();
 const path = require("path");
-const { logger } = require("./middleware/logger");
-const Errorhandler = require("./middleware/Errorhandler");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const mongoose = require("mongoose");
+
+const { logger, logEvents } = require("./middleware/logger");
+const Errorhandler = require("./middleware/Errorhandler");
 const corsOptions = require("./config/corsOptions");
 const connectDB = require("./config/DBconn.js");
-const mongoose = require("mongoose");
-const { logEvents } = require("./middleware/logger.js");
 const { checkToken, checkVerified } = require("./middleware.js");
-const PORT = process.env.PORT || 3500;
 
-app.use(express.static(path.join(__dirname, 'dist')));
+const app = express();
+const PORT = process.env.PORT || 3500;
 
 connectDB();
 
 app.use(logger);
-
 app.use(cors(corsOptions));
-
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-
 app.use(cookieParser());
 
-app.use("/", express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "dist")));
+
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.use("/", require("./routes/root"));
 app.use("/api/users", require("./routes/userRoutes"));
@@ -36,8 +34,6 @@ app.use(
   checkVerified,
   require("./routes/studentRoutes.js")
 );
-
-// csa -> child sponsor allotment
 app.use(
   "/api/allotment",
   checkToken,
@@ -47,12 +43,12 @@ app.use(
 
 app.use(Errorhandler);
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 mongoose.connection.once("open", () => {
-  console.log("connection to MongoDB");
+  console.log("Connected to MongoDB");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
 
