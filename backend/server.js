@@ -42,6 +42,7 @@ app.use(
 app.use(Errorhandler);
 
 app.get("*", (req, res) => {
+  console.log("Catch-all triggered for:", req.originalUrl);
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
