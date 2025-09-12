@@ -23,10 +23,8 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, "dist")));
-
 app.use("/public", express.static(path.join(__dirname, "public")));
 
-app.use("/", require("./routes/root"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use(
   "/api/students",
