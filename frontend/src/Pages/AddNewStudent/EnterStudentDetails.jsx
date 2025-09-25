@@ -49,10 +49,6 @@ const EnterStudentDetails = () => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
-
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -121,9 +117,9 @@ const EnterStudentDetails = () => {
       <div className="flex flex-col w-full xl:flex-row xl:h-[calc(100vh-7rem)]">
         <div className="flex justify-center items-center w-full h-[500px] xl:w-2/5 xl:h-full">
           <img
-            src="/girl_photo.png"
-            alt="girl_photo"
-            className="object-contain h-4/5"
+            src="/students-image.jpg"
+            alt="students-image"
+            className="object-contain w-4/5 rounded-md"
           />
         </div>
 

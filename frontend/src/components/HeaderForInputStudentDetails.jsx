@@ -16,7 +16,7 @@ const HeaderForEnputStudentDetails = () => {
         {/* Heading section */}
         <div className="heading w-full md:w-[80%] flex flex-col items-center justify-center h-32 md:h-full text-center  text-3xl md:text-2xl lg:text-3xl md:pl-[20%]">
           <div className="heading1 font-bold mb-1">
-            Let&apos;s Get You Started
+            Student Registration Page
           </div>
           <div className="heading2 text-[1rem] text-gray-500 font-semibold" style={{color:'#686868'}}>
             Enter the details of the student

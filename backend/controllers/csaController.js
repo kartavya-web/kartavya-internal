@@ -3,7 +3,6 @@ const ChildSponsorMap = require("./../models/ChildSponsorMapSchema");
 const mongoose = require("mongoose");
 const Student = require("./../models/Student");
 const User = require("./../models/User");
-const { getUserById } = require("../controllers/userControllers");
 const generateEmailTemplate = require("../Utils/mailTemplate");
 const { sendEmail } = require("../Utils/mailer");
 
@@ -20,7 +19,6 @@ const getVerifiedDonations = asyncHandler(async (req, res) => {
 // @access Private
 const getChildTobeAlloted = asyncHandler(async (req, res) => {
   const sponsorid = req.headers["sponsorid"];
-  console.log(sponsorid, "❤️❤️");
 
   const students = await Student.find({
     sponsorshipStatus: true,
@@ -40,7 +38,6 @@ const getChildTobeAlloted = asyncHandler(async (req, res) => {
 
 const performCATransaction = async (sponsorId, studentId) => {
   const session = await mongoose.startSession();
-  console.log(sponsorId, "sponsorId 👍👍");
   session.startTransaction();
 
   try {
@@ -65,10 +62,11 @@ const performCATransaction = async (sponsorId, studentId) => {
     if (!student) {
       throw new Error("Student not found.");
     }
-
+    
     if (student.sponsorId?.includes(sponsorId)) {
       throw new Error("Student is already allotted to this sponsor.");
     }
+
 
     // Step 2: Push studentId into the sponsoredStudents attribute of User
     await User.updateOne(
@@ -99,7 +97,6 @@ const performCATransaction = async (sponsorId, studentId) => {
 
     // Commit the transaction
     await session.commitTransaction();
-    console.log("Transaction committed successfully! 👍👍");
   } catch (error) {
     await session.abortTransaction();
     console.error("Transaction failed, rolled back!", error);
@@ -141,7 +138,7 @@ const allotChild = asyncHandler(async (req, res) => {
 
   try {
     await performCATransaction(sponsorId, studentId);
-    const sponsor = await getUserById(sponsorId);
+    const sponsor = await User.findById(sponsorId);
     if (!sponsor) {
       return res.status(404).json({ message: "Sponsor not found" });
     }

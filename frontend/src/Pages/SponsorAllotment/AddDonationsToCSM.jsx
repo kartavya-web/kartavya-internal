@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AddDonationsToCSM = () => {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ const AddDonationsToCSM = () => {
   const [donationId, setDonationId] = useState("");
   const [date, setDate] = useState("");
   const [numChild, setNumChild] = useState(0);
-  const [responseMsg, setResponseMsg] = useState("");
   const token = localStorage.getItem("token");
 
   const handleSubmit = async (e) => {
@@ -45,10 +45,9 @@ const AddDonationsToCSM = () => {
         throw new Error("Failed to submit");
       }
 
-      setResponseMsg("✅ Data inserted successfully!");
+      toast.success("Data inserted successfully!");
     } catch (error) {
-      console.error("Error inserting data:", error);
-      setResponseMsg("❌ Error inserting data.");
+      toast.error("Error inserting data: ", error);
     }
   };
 
@@ -152,12 +151,6 @@ const AddDonationsToCSM = () => {
             Submit
           </Button>
         </form>
-
-        {responseMsg && (
-          <p className="mt-4 text-center text-sm font-medium text-gray-700">
-            {responseMsg}
-          </p>
-        )}
       </main>
     </div>
   );
