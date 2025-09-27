@@ -14,7 +14,7 @@ module.exports.checkToken = (req, res, next) => {
   }
 };
 
-module.exports.checkVerified = (req, res, next) => {
+module.exports.authorizeAdmin = (req, res, next) => {
   jwt.verify(req.token, process.env.JWT_KEY, async (err, authorizedData) => {
     if (err) {
       return res.status(403).json({ message: "Invalid token" });
@@ -29,6 +29,10 @@ module.exports.checkVerified = (req, res, next) => {
           "Account not verified. Please verify your account to access this page.",
       });
     }
+    if(user.role !== 'admin'){
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
     req.user = user;
     next();
   });
