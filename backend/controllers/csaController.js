@@ -36,83 +36,13 @@ const getChildTobeAlloted = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: students });
 });
 
-const performCATransaction = async (sponsorId, studentId) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  try {
-    const donationObject = await ChildSponsorMap.findOne({
-      user: sponsorId,
-    }).session(session);
-
-    if (!donationObject || donationObject.donations.length === 0) {
-      throw new Error("No donation record found for the sponsor.");
-    }
-
-    const firstDonation = donationObject.donations[0];
-    const donationId = firstDonation.donationId;
-    const numChild = firstDonation.numChild;
-
-    if (numChild <= 0) {
-      throw new Error("Invalid donation record: numChild is already zero.");
-    }
-
-    // Step 1: Check if the student is already allotted to the sponsor
-    const student = await Student.findById(studentId).session(session);
-    if (!student) {
-      throw new Error("Student not found.");
-    }
-    
-    if (student.sponsorId?.includes(sponsorId)) {
-      throw new Error("Student is already allotted to this sponsor.");
-    }
-
-
-    // Step 2: Push studentId into the sponsoredStudents attribute of User
-    await User.updateOne(
-      { _id: sponsorId },
-      { $addToSet: { sponsoredStudents: studentId } },
-      { session }
-    );
-
-    // Step 3: Push sponsorId into the sponsorId attribute of Student
-    await Student.updateOne(
-      { _id: studentId },
-      { $addToSet: { sponsorId: sponsorId } },
-      { session }
-    );
-
-    // Step 4: Decrease the numChild value in the donations array
-    firstDonation.numChild -= 1;
-
-    if (firstDonation.numChild === 0) {
-      // Remove the donation if numChild becomes zero
-      donationObject.donations = donationObject.donations.filter(
-        (donation) => donation.donationId.toString() !== donationId.toString()
-      );
-    }
-
-    // Save the modified donationObject
-    await donationObject.save({ session });
-
-    // Commit the transaction
-    await session.commitTransaction();
-  } catch (error) {
-    await session.abortTransaction();
-    console.error("Transaction failed, rolled back!", error);
-    throw error;
-  } finally {
-    session.endSession();
-  }
-};
-
 const sendAllotmentEmail = async (sponsor, student) => {
   const emailTemplate = generateEmailTemplate({
     title: "Child Allotment Confirmation - Kartavya IIT(ISM)",
     message: `Hello ${sponsor.name}, Thank you for choosing to sponsor a child. We have allotted you a child to support through our platform.`,
     highlightBox: true,
     highlightContent: `Please login to your account to view the child's details.`,
-    buttonLink: "https://kartavya.org",
+    buttonLink: "https://kartavya.org/login",
     buttonText: "Login to Kartavya",
     additionalContent: `
     <p>We truly appreciate your continued support towards the education of underprivileged children.</p>
@@ -137,14 +67,72 @@ const allotChild = asyncHandler(async (req, res) => {
   const { sponsorId, studentId } = req.body;
 
   try {
-    await performCATransaction(sponsorId, studentId);
     const sponsor = await User.findById(sponsorId);
     if (!sponsor) {
       return res.status(404).json({ message: "Sponsor not found" });
     }
+
     const student = await Student.findById(studentId).lean();
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
+    }
+
+    const donationObject = await ChildSponsorMap.findOne({
+      user: sponsorId,
+    });
+
+    if (!donationObject || donationObject.donations.length === 0) {
+      throw new Error("No donation record found for the sponsor.");
+    }
+
+    const firstDonation = donationObject.donations[0];
+    const numChild = firstDonation.numChild;
+
+    if (numChild <= 0) {
+      throw new Error("Invalid donation record: numChild is already zero.");
+    }
+
+    if (student.sponsorId?.includes(sponsorId)) {
+      throw new Error("Student is already allotted to this sponsor.");
+    }
+
+    // Push studentId into the sponsoredStudents attribute of Sponsor
+    await User.updateOne(
+      { _id: sponsorId },
+      { $addToSet: { sponsoredStudents: studentId } }
+    );
+
+    // Push sponsorId into the sponsorId attribute of Student
+    await Student.updateOne(
+      { _id: studentId },
+      { $addToSet: { sponsorId: sponsorId } }
+    );
+    
+    // Decrement numChild in the first donation object
+    firstDonation.numChild -= 1;
+
+    if (firstDonation.numChild > 0) {
+      // Still children left in this donation → just save
+      await donationObject.save();
+    }
+    else if (firstDonation.numChild === 0) {
+      // Remove this donation from the array
+      donationObject.donations = donationObject.donations.filter(
+        (donation) =>
+          donation.donationId.toString() !== firstDonation.donationId.toString()
+      );
+
+      console.log(donationObject.donations, "Updated donations after removal");
+
+      if (donationObject.donations.length > 0) {
+        // Some donations still exist → save the reduced array
+        console.log("Saving donation object with reduced donations array");
+        await donationObject.save();
+      } else {
+        // No donations left → remove the entire document
+        console.log("Removing entire ChildSponsorMap document as no donations left");
+        await ChildSponsorMap.deleteOne({ _id: donationObject._id });
+      }
     }
 
     await sendAllotmentEmail(sponsor, student);
@@ -195,6 +183,16 @@ const addDonationsToCSM = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Missing required fields." });
   }
 
+  const existingDonationId = await ChildSponsorMap.findOne({
+    "donations.donationId": donations[0].donationId,
+  });
+
+  console.log(existingDonationId, "existingDonationId");
+
+  if(existingDonationId) {
+    return res.status(400).json({ message: "This donation already exists in CSM Table." });
+  }
+
   const rawDonation = donations[0];
 
   const donationToAdd = {
@@ -208,7 +206,9 @@ const addDonationsToCSM = asyncHandler(async (req, res) => {
   if (existingMap) {
     existingMap.donations.push(donationToAdd);
     await existingMap.save();
-    return res.status(200).json({ message: "Donation added to existing sponsor map." });
+    return res
+      .status(200)
+      .json({ message: "Donation added to existing sponsor map." });
   } else {
     const newMap = new ChildSponsorMap({
       user,
@@ -217,10 +217,11 @@ const addDonationsToCSM = asyncHandler(async (req, res) => {
     });
 
     await newMap.save();
-    return res.status(201).json({ message: "New sponsor map created and donation added." });
+    return res
+      .status(201)
+      .json({ message: "New sponsor map created and donation added." });
   }
 });
-
 
 module.exports = {
   getVerifiedDonations,

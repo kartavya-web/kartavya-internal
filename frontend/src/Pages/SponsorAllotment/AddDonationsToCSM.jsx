@@ -41,13 +41,14 @@ const AddDonationsToCSM = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to submit");
+      if(!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message|| "Failed to insert data");
       }
-
+      
       toast.success("Data inserted successfully!");
     } catch (error) {
-      toast.error("Error inserting data: ", error);
+      toast.error(error.message);
     }
   };
 
