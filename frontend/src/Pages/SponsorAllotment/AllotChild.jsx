@@ -2,9 +2,11 @@ import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import { useSponsor } from "@/context/SponsorContext.jsx";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ChildList from "./ChildList";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft } from "lucide-react";
 
 const AllotChild = () => {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ const AllotChild = () => {
   const [loading, setLoading] = useState(false);
   const [childTobeAlloted, setChildTobeAlloted] = useState([]);
   const [selectedChild, setSelectedChild] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSelectChild = (child) => {
     setSelectedChild(child);
@@ -91,6 +94,11 @@ const AllotChild = () => {
     };
   }, []);
 
+  const filteredChildren = childTobeAlloted.filter((child) =>
+    child.studentName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+
   if (!sponsorId) {
     return (
       <div className="w-screen h-screen flex justify-center items-center text-2xl font-semibold">
@@ -113,7 +121,10 @@ const AllotChild = () => {
 
   return (
     <div className="px-10">
-      <div className="text-3xl font-semibold text-center py-5">
+      <Link to="/allotment">
+        <Button className="mt-5"><ArrowLeft></ArrowLeft></Button>
+      </Link>
+      <div className="text-3xl font-semibold text-center">
         Child Allotment Page
       </div>
       <div className="pt-10">
@@ -139,9 +150,20 @@ const AllotChild = () => {
           </div>
         </div>
 
-        <div className="mt-20">
+        <div className="flex justify-between w-full mt-10">
+          <Input
+            type="text"
+            placeholder="Search by name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="rounded-lg p-2 w-[20%] text-sm "
+          />
+          <div> Remaining Students : {childTobeAlloted.length}</div>
+        </div>
+
+        <div className="mt-5">
           <ChildList
-            childList={childTobeAlloted}
+            childList={filteredChildren}
             handleSelectChild={handleSelectChild}
             selectedChild={selectedChild}
           />
