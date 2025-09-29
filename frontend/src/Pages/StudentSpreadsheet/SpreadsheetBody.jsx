@@ -46,13 +46,15 @@ const SpreadsheetBody = ({ studentData }) => {
             Log Out
           </Button>
         </div>
-        <div className="px-10 py-5">
+        <div className="w-full flex justify-between px-10 py-5">
           <Input
             type="text"
             placeholder="Search for student with name"
             value={searchQuery}
             onChange={handleInputChange}
+            className="rounded-lg p-2 w-[30%]"
           />
+          <div> Student Count : <span className="font-bold">{studentsSearchedByName?.length}</span></div>
         </div>
       </div>
       <div className="w-full flex justify-center items-center">
