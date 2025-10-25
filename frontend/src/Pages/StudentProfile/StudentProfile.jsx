@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 // import AttendanceMonitoringGraph from "./AttendenceMonitoringGraph";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@radix-ui/react-icons";
-import DialogForResultEdit from "../../components/Dialogs/DialogForResultEdit";
 import DialogForPdfPreview from "../../components/Dialogs/DialogForPdfPreview";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
@@ -19,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import TextareaComponent from "@/components/Form/TextareaComponent";
 import { Link } from "react-router-dom";
 import { Centres, Gender, Schools } from "@/constants/constants";
+import Result from "./Result";
 
 const StudentProfile = () => {
   const navigate = useNavigate();
@@ -610,118 +610,20 @@ const StudentProfile = () => {
               </div>
             </div>
 
-            {/* <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
-              <label
-                htmlFor="feesWePay"
-                className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Total Fees we pay
-              </label>
-              <div className="w-[200px]">
-                <input
-                  type="number"
-                  name="feesWePay"
-                  placeholder={
-                    studentData?.payTotalFees === false
-                      ? "Enter the amount"
-                      : ""
-                  }
-                  className="p-2 text-sm font-semibold outline-none rounded-lg"
-                  value={
-                    studentData?.payTotalFees === true
-                      ? studentData?.annualFees
-                      : studentData?.feesWePay
-                  }
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div> */}
-
-            {/* <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
-              <label
-                htmlFor="sponserName"
-                className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Name of Sponsor
-              </label>
-              <div className="w-[200px]">
-                <Input
-                  type="text"
-                  name="sponserName"
-                  className="p-2 text-sm font-semibold rounded-lg bg-white"
-                  placeholder="Enter sponsor name"
-                  value={studentData?.sponserName}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div> */}
-
-            {/* <div className="flex items-center w-full h-9 px-[2.5%]">
-              <label
-                htmlFor="amountBySponsor"
-                className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Total Amount by Sponsor
-              </label>
-              <div className="w-[200px]">
-                <Input
-                  type="number"
-                  name="amountBySponsor"
-                  className="p-2 text-sm font-semibold rounded-lg outline-none bg-white"
-                  placeholder="Enter total amount"
-                  value={studentData?.amountBySponsor}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div> */}
-
-            {/* <div className="flex items-center w-full h-9 px-[2.5%]">
-              <label
-                htmlFor="amountBySponsor"
-                className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Sponsors
-              </label>
-            </div> */}
-
-            {/* <div className="w-full flex items-center h-9 px-[2.5%] mt-5">
-              <div className="w-full flex flex-col gap-2 mt-2">
-                {temp.map((item, idx) => (
-                  <div key={idx} className="flex justify-between">
-                    <div>{item.name}</div>
-                    <Button>Deallot sponsor</Button>
-                  </div>
-                ))}
-              </div>
-            </div> */}
           </div>
-
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
         </div>
 
+        {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
         {/* Result Details */}
 
         <div className="result-details w-[90%] m-auto mt-20">
-          <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
-            Result Details
-            <DialogForResultEdit resultExists={studentData?.result} />
-          </div>
+          <Result studentData={studentData}/>
+        </div>
 
-          {studentData?.result && (
-            <div className="filters flex flex-col gap-10 p-[25px]">
-              <div className="result h-full rounded-lg border">
-                <img src={studentData?.result} alt="result"></img>
-              </div>
-            </div>
-          )}
-
-          {/* Result Graph */}
-
+        {/* Result Graph */}
           {/* <div className="result-graph w-full h-[400px]">
               <StudentProgressGraph results={studentData?.results} />
             </div> */}
-        </div>
-
         {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
 
         {/* Attendence details */}
@@ -768,7 +670,7 @@ const StudentProfile = () => {
               </Button>
             )}
             <div>
-              <AlertForDialogDeletion handleClick={handleDeleteStudent} />
+              <AlertForDialogDeletion handleClick={handleDeleteStudent} text={" student "} />
             </div>
           </div>
         </div>
