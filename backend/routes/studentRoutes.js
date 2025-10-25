@@ -52,7 +52,6 @@ router.route(`/:rollNumber/uploadResult`).patch(
     await studentController.updateResult(req, res, resultUrl);
   })
 );
-
 router.route(`/:rollNumber/updateProfilePhoto`).patch(
   upload.single("profilePicture"), // Handle file upload
   asyncHandler(azure.uploadToAzureBlob),
@@ -61,5 +60,8 @@ router.route(`/:rollNumber/updateProfilePhoto`).patch(
     await studentController.updateProfilePhoto(req, res, profileUrl);
   })
 );
+// -----------------------------------------------------------------------------------------------
+// Get all sponsors associated with a student
+router.get("/:studentId/sponsors", studentController.getSponsorsByStudentId);
 
 module.exports = router;
