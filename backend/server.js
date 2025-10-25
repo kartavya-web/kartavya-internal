@@ -28,8 +28,8 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use(
   "/api/students",
-  checkToken,
-  checkVerified,
+  // checkToken,
+  // checkVerified,
   require("./routes/studentRoutes.js")
 );
 app.use(
