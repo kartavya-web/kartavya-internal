@@ -9,7 +9,11 @@ const { logger, logEvents } = require("./middleware/logger");
 const Errorhandler = require("./middleware/Errorhandler");
 const corsOptions = require("./config/corsOptions");
 const connectDB = require("./config/DBconn.js");
-const { checkToken, checkVerified, authorizeAdmin } = require("./middleware.js");
+const {
+  checkToken,
+  checkVerified,
+  authorizeAdmin,
+} = require("./middleware.js");
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -28,8 +32,13 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use(
   "/api/students",
+
   checkToken,
   authorizeAdmin,
+
+  // checkToken,
+  // checkVerified,
+
   require("./routes/studentRoutes.js")
 );
 app.use(
