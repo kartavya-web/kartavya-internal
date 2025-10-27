@@ -416,7 +416,7 @@ const getSponsorsByStudentId = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Student ID is required" });
   }
 
-  const student = await Student.findById(studentId)
+  const student = await Student.findOne({ rollNumber: studentId })
     .populate("sponsorId", "name email batch")
     .lean();
 

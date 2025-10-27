@@ -70,13 +70,9 @@ const StudentProfile = () => {
   // -------------------------------------------------------------------------------------------------
   useEffect(() => {
     const fetchSponsors = async () => {
-      const studentResp = await fetch(
-        `/api/students/${encodeURIComponent(id)}`
-      );
-      const studentDataRes = await studentResp.json();
       try {
         const response = await fetch(
-          `/api/students/${encodeURIComponent(studentDataRes._id)}/sponsors`,
+          `/api/student-public/${encodeURIComponent(id)}/sponsors`,
           {
             method: "GET",
             credentials: "include",
@@ -86,20 +82,25 @@ const StudentProfile = () => {
           }
         );
 
-        if (!response.ok) throw new Error("Failed to fetch sponsors");
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(
+            `Failed to fetch sponsors: ${response.status} → ${errText}`
+          );
+        }
+
         const data = await response.json();
-        // console.log(data.sponsor);
+        console.log("Fetched sponsors:", data);
         setSponsors(data.sponsors);
       } catch (error) {
-        toast.error("Error fetching sponsors 1");
         console.error("Error fetching sponsors:", error);
+        toast.error("Error fetching sponsors");
       }
     };
 
-    fetchSponsors();
-    console.log("sponsors");
-    console.log(sponsors);
-  }, [studentData]);
+    if (id && token) fetchSponsors();
+  }, [id, token]);
+
   // ---------------------------------------------------------------------------------------------------
 
   const handleInputChange = (e) => {
