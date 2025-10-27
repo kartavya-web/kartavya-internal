@@ -337,9 +337,13 @@ const deleteResult = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "No results to delete" });
     }
 
-    const index = student.result.findIndex(r => r.sessionTerm === sessionTerm);
+    const index = student.result.findIndex(
+      (r) => r.sessionTerm === sessionTerm
+    );
     if (index === -1) {
-      return res.status(404).json({ message: "Result for this session term not found" });
+      return res
+        .status(404)
+        .json({ message: "Result for this session term not found" });
     }
 
     const oldURL = student.result[index].url;
@@ -361,8 +365,6 @@ const deleteResult = asyncHandler(async (req, res) => {
     });
   }
 });
-
-
 
 // @desc Update profilePhoto of a particular Student by rollNumber
 // @route PATCH/Students/:rollNumber
@@ -481,7 +483,7 @@ const getSponsorsByStudentId = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Student ID is required" });
   }
 
-  const student = await Student.findById(studentId)
+  const student = await Student.findOne({ rollNumber: studentId })
     .populate("sponsorId", "name email batch")
     .lean();
 

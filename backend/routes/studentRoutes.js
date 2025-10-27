@@ -7,6 +7,7 @@ const catchAsync = require("../Utils/catchAsync.js");
 const path = require("path");
 const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
+const { checkToken } = require("../middleware.js");
 
 const sanitizeFilename = (originalname) => {
   const ext = path.extname(originalname).toLowerCase(); // Get file extension
@@ -65,8 +66,5 @@ router.route(`/:rollNumber/updateProfilePhoto`).patch(
     await studentController.updateProfilePhoto(req, res, profileUrl);
   })
 );
-// -----------------------------------------------------------------------------------------------
-// Get all sponsors associated with a student
-router.get("/:studentId/sponsors", studentController.getSponsorsByStudentId);
 
 module.exports = router;

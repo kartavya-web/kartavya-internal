@@ -30,6 +30,9 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.use("/api/users", require("./routes/userRoutes"));
+
+app.use("/api/student-public", require("./routes/studentPublicRoutes.js"));
+
 app.use(
   "/api/students",
   checkToken,
