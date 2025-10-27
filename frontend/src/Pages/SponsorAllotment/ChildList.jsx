@@ -11,21 +11,21 @@ import { Link } from "react-router-dom";
 
 const ChildList = ({ childList, handleSelectChild, selectedChild }) => {
   return (
-    <div className="w-[90%] border rounded-lg flex justify-center items-center m-auto">
+    <div className="border flex rounded-lg">
       <Table className="w-full relative">
         <TableHeader className="w-full text-muted-foreground">
           <TableRow className="w-full">
-            <TableHead className="w-1/5 pl-5">Name</TableHead>
-            <TableHead className="w-1/5">Class</TableHead>
-            <TableHead className="w-1/5">Center</TableHead>
-            <TableHead className="w-1/5">School</TableHead>
-            <TableHead className="w-1/5 text-end pr-5">Action</TableHead>
+            <TableHead className="w-2/6 pl-5">Name</TableHead>
+            <TableHead className="w-1/6">Class</TableHead>
+            <TableHead className="w-1/6">Center</TableHead>
+            <TableHead className="w-1/6">School</TableHead>
+            <TableHead className="w-1/6 text-end pr-5">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {childList?.map((student) => (
             <TableRow key={student._id} className={`hover:bg-gray-100`}>
-              <TableCell className="w-1/5 pl-5 flex items-center gap-3">
+              <TableCell className="w-2/6 pl-5 flex items-center gap-3">
                 <Link
                   to={`/admin/${encodeURIComponent(student.rollNumber)}`}
                   className="hover:underline underline-offset-4"
@@ -35,13 +35,13 @@ const ChildList = ({ childList, handleSelectChild, selectedChild }) => {
                   </span>
                 </Link>
               </TableCell>
-              <TableCell className="w-1/5 text-start font-semibold">
+              <TableCell className="w-1/6 text-start font-semibold">
                 {student.class}
               </TableCell>
-              <TableCell className="w-1/5 text-start font-semibold">
+              <TableCell className="w-1/6 text-start font-semibold">
                 {student.centre}
               </TableCell>
-              <TableCell className="w-1/5 text-start">
+              <TableCell className="w-1/6 text-start">
                 {student.school}
               </TableCell>
               <TableCell className={`text-end`}>

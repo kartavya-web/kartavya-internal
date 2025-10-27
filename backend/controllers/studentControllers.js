@@ -263,8 +263,8 @@ const updateStudent = asyncHandler(async (req, res) => {
 // @access Private
 const updateResult = asyncHandler(async (req, res, resultUrl) => {
   const rollNumber = req.params.rollNumber;
+  const { sessionTerm } = req.body;
 
-  // Validate required parameters
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
   }
@@ -273,22 +273,38 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     return res.status(400).json({ message: "Result not uploaded properly" });
   }
 
+  if (!sessionTerm) {
+    return res.status(400).json({ message: "Session term is required" });
+  }
+
   try {
     const student = await Student.findOne({ rollNumber }).exec();
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    const oldURL = student.result;
-    if (oldURL) {
-      await azure.deleteFromAzureBlob(oldURL);
+    if (!Array.isArray(student.result)) {
+      student.result = [];
     }
 
-    student.result = resultUrl;
+    const existingIndex = student.result.findIndex(
+      (r) => r.sessionTerm === sessionTerm
+    );
+
+    if (existingIndex !== -1) {
+      const oldURL = student.result[existingIndex].url;
+      if (oldURL) {
+        await azure.deleteFromAzureBlob(oldURL);
+      }
+      student.result[existingIndex].url = resultUrl;
+    } else {
+      student.result.push({ sessionTerm: sessionTerm, url: resultUrl });
+    }
+
     await student.save();
 
     res.status(200).json({
-      message: `Result of ${student.studentName} updated successfully.`,
+      message: `Result for "${sessionTerm}" of ${student.studentName} updated successfully.`,
     });
   } catch (error) {
     console.error("Error updating student result:", error);
@@ -298,6 +314,55 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     });
   }
 });
+
+const deleteResult = asyncHandler(async (req, res) => {
+  const rollNumber = req.params.rollNumber;
+  const { sessionTerm } = req.body;
+
+  if (!rollNumber) {
+    return res.status(400).json({ message: "Roll Number required" });
+  }
+
+  if (!sessionTerm) {
+    return res.status(400).json({ message: "Session term required" });
+  }
+
+  try {
+    const student = await Student.findOne({ rollNumber }).exec();
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    if (!Array.isArray(student.result) || student.result.length === 0) {
+      return res.status(400).json({ message: "No results to delete" });
+    }
+
+    const index = student.result.findIndex(r => r.sessionTerm === sessionTerm);
+    if (index === -1) {
+      return res.status(404).json({ message: "Result for this session term not found" });
+    }
+
+    const oldURL = student.result[index].url;
+    if (oldURL) {
+      await azure.deleteFromAzureBlob(oldURL);
+    }
+
+    student.result.splice(index, 1);
+    await student.save();
+
+    res.status(200).json({
+      message: `Result for "${sessionTerm}" of ${student.studentName} deleted successfully.`,
+    });
+  } catch (error) {
+    console.error("Error deleting student result:", error);
+    res.status(500).json({
+      message: "Error deleting the result of student",
+      error: error.message,
+    });
+  }
+});
+
+
 
 // @desc Update profilePhoto of a particular Student by rollNumber
 // @route PATCH/Students/:rollNumber
@@ -450,6 +515,7 @@ module.exports = {
   updateStudent,
   deleteStudent,
   updateResult,
+  deleteResult,
   updateProfilePhoto,
   getBase64Image,
   getSponsorsByStudentId,

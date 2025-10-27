@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 // import AttendanceMonitoringGraph from "./AttendenceMonitoringGraph";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@radix-ui/react-icons";
-import DialogForResultEdit from "../../components/Dialogs/DialogForResultEdit";
 import DialogForPdfPreview from "../../components/Dialogs/DialogForPdfPreview";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
@@ -19,7 +18,9 @@ import { Textarea } from "@/components/ui/textarea";
 import TextareaComponent from "@/components/Form/TextareaComponent";
 import { Link } from "react-router-dom";
 import { Centres, Gender, Schools } from "@/constants/constants";
-console.log("---------------------------------------------");
+
+import Result from "./Result";
+
 const StudentProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -673,6 +674,7 @@ const StudentProfile = () => {
                 />
               </div>
             </div>
+
             {/* <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
               <label
                 htmlFor="feesWePay"
@@ -758,33 +760,24 @@ const StudentProfile = () => {
               </div>
             </div> */}
           </div>
-
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
         </div>
+
+        {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+
         {/* Result Details */}
         <div className="result-details w-[90%] m-auto mt-20">
-          <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
-            Result Details
-            <DialogForResultEdit resultExists={studentData?.result} />
-          </div>
+          <Result studentData={studentData} />
+        </div>
 
-          {studentData?.result && (
-            <div className="filters flex flex-col gap-10 p-[25px]">
-              <div className="result h-full rounded-lg border">
-                <img src={studentData?.result} alt="result"></img>
-              </div>
-            </div>
-          )}
-
-          {/* Result Graph */}
-
-          {/* <div className="result-graph w-full h-[400px]">
+        {/* Result Graph */}
+        {/* <div className="result-graph w-full h-[400px]">
               <StudentProgressGraph results={studentData?.results} />
             </div> */}
-        </div>
-        {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
-        {/* Attendence details */}
-        {/* <div className="attendence-details w-[90%] m-auto mt-20">
+      </div>
+
+      {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
+      {/* Attendence details */}
+      {/* <div className="attendence-details w-[90%] m-auto mt-20">
             <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
               Attendence Details
               <DialogForAttendenceEdit
@@ -792,46 +785,49 @@ const StudentProfile = () => {
                 setStudentData={setStudentData}
               />
             </div> */}
-        {/* Attendence Graph */}
-        {/* <div className="result-graph w-full h-[400px] mb-10">
+      {/* Attendence Graph */}
+      {/* <div className="result-graph w-full h-[400px] mb-10">
               <AttendanceMonitoringGraph
                 attendanceData={studentData?.attendence}
               />
             </div>
           </div> */}
-        {/* comment section */}
-        <div className="result-details w-[90%] m-auto mt-20">
-          <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
-            Remarks about student
-          </div>
-          <div>
-            <TextareaComponent
-              name="comment"
-              placeholder="Write comment about the student"
-              value={studentData?.comment}
-              handleInputChange={handleInputChange}
-            />
-          </div>
+      {/* comment section */}
+      <div className="result-details w-[90%] m-auto mt-20">
+        <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
+          Remarks about student
         </div>
-        {/* -------------------------------------------------------------------------------------------- */}
-        {/* Sponsors Details  */}
+        <div>
+          <TextareaComponent
+            name="comment"
+            placeholder="Write comment about the student"
+            value={studentData?.comment}
+            handleInputChange={handleInputChange}
+          />
+        </div>
+      </div>
+      {/* -------------------------------------------------------------------------------------------- */}
+      {/* Sponsors Details  */}
 
-        {/* Download Profile option */}
-        <div className="download-profile w-[90%] m-auto mt-32">
-          <div className="w-full flex justify-center gap-5 text-2xl font-semibold text-primary mb-5">
-            <DialogForPdfPreview studentData={studentData} />
-            {studentDataChanged && (
-              <Button onClick={handleSaveChanges}>
-                <CheckIcon /> <span className="ml-2"> Save Changes</span>
-              </Button>
-            )}
-            <div>
-              <AlertForDialogDeletion handleClick={handleDeleteStudent} />
-            </div>
+      {/* Download Profile option */}
+      <div className="download-profile w-[90%] m-auto mt-32">
+        <div className="w-full flex justify-center gap-5 text-2xl font-semibold text-primary mb-5">
+          <DialogForPdfPreview studentData={studentData} />
+          {studentDataChanged && (
+            <Button onClick={handleSaveChanges}>
+              <CheckIcon /> <span className="ml-2"> Save Changes</span>
+            </Button>
+          )}
+          <div>
+            <AlertForDialogDeletion
+              handleClick={handleDeleteStudent}
+              text={" student "}
+            />
           </div>
         </div>
       </div>
     </div>
+    // </div>
   );
 };
 
