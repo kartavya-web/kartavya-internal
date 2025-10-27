@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 // import AttendanceMonitoringGraph from "./AttendenceMonitoringGraph";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@radix-ui/react-icons";
-import DialogForResultEdit from "../../components/Dialogs/DialogForResultEdit";
 import DialogForPdfPreview from "../../components/Dialogs/DialogForPdfPreview";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
@@ -20,17 +19,20 @@ import TextareaComponent from "@/components/Form/TextareaComponent";
 import { Link } from "react-router-dom";
 import { Centres, Gender, Schools } from "@/constants/constants";
 
+import Result from "./Result";
+
 const StudentProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-
+  // console.log(id);
   const [studentData, setStudentData] = useState(null);
+  const [sponsors, setSponsors] = useState(null);
   const [studentDataChanged, setStudentDataChanged] = useState(false);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    console.log("studentData", studentData);
+    // console.log("studentData", studentData);
   }, [studentData]);
 
   useEffect(() => {
@@ -66,6 +68,41 @@ const StudentProfile = () => {
     fetchStudentData();
   }, [id]);
 
+  // -------------------------------------------------------------------------------------------------
+  useEffect(() => {
+    const fetchSponsors = async () => {
+      const studentResp = await fetch(
+        `/api/students/${encodeURIComponent(id)}`
+      );
+      const studentDataRes = await studentResp.json();
+      try {
+        const response = await fetch(
+          `/api/students/${encodeURIComponent(studentDataRes._id)}/sponsors`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch sponsors");
+        const data = await response.json();
+        // console.log(data.sponsor);
+        setSponsors(data.sponsors);
+      } catch (error) {
+        toast.error("Error fetching sponsors 1");
+        console.error("Error fetching sponsors:", error);
+      }
+    };
+
+    fetchSponsors();
+    console.log("sponsors");
+    console.log(sponsors);
+  }, [studentData]);
+  // ---------------------------------------------------------------------------------------------------
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -87,7 +124,7 @@ const StudentProfile = () => {
       }
 
       for (let [key, value] of formDataToSend.entries()) {
-        console.log(key, value);
+        // console.log(key, value);
       }
 
       const res = await fetch(`/api/students/${encodeURIComponent(id)}`, {
@@ -105,7 +142,7 @@ const StudentProfile = () => {
       }
 
       const message = await res.json();
-      console.log(message, "message");
+      // console.log(message, "message");
 
       toast.success(message.message);
       setStudentDataChanged(false);
@@ -207,11 +244,8 @@ const StudentProfile = () => {
         <div className="heading text-3xl font-semibold text-center pt-5 pb-5 border-b w-full">
           Student Profile
         </div>
-
         {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
-
         {/* General Details */}
-
         <div className="general-details w-[90%] m-auto mt-10">
           <div className="w-full flex justify-between text-2xl h-10 font-semibold text-primary">
             General Details
@@ -394,9 +428,7 @@ const StudentProfile = () => {
             </div>
           </div>
         </div>
-
         {/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
-
         <div className="flex w-[90%] m-auto mt-20">
           {/* Document Details */}
           <div className="document-details flex flex-col w-full gap-[1.55rem]">
@@ -542,14 +574,47 @@ const StudentProfile = () => {
             </div>
           </div>
 
-          {/* ----------------------------------------------------------------------------------------------------------------------------------------- */}
-
           {/* Sponsorship Details */}
           <div className="sponsorhip-details flex flex-col w-full gap-2">
             <div className="w-full text-2xl font-semibold text-primary mb-5">
               Sponsorship Details
             </div>
-
+            {/* --------------------------------------------------------------------------------------- */}
+            {/* Sponsors List */}
+            <div className="mt-4 pl-[2.5%] pr-[2.5%]">
+              <h3 className="text-xl font-semibold mb-3">Sponsors</h3>
+              {sponsors && sponsors.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {sponsors.map((sponsor, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center border p-2 rounded-lg bg-white"
+                    >
+                      <div>
+                        <p className="font-semibold">{sponsor.name}</p>
+                        <p className="text-sm text-gray-600">{sponsor.email}</p>
+                        {sponsor.batch && (
+                          <p className="text-sm text-gray-600">
+                            {sponsor.batch} Passout
+                          </p>
+                        )}
+                      </div>
+                      {/* <Button
+                        variant="destructive"
+                        onClick={() => handleDeallotSponsor(sponsor._id)}
+                      >
+                        Deallot
+                      </Button> */}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600 italic">
+                  No sponsors found for this student.
+                </p>
+              )}
+            </div>
+            {/* ----------------------------------------------------------------------------------- */}
             <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%] ">
               <label
                 htmlFor="isSponsored"
@@ -695,37 +760,24 @@ const StudentProfile = () => {
               </div>
             </div> */}
           </div>
-
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
         </div>
+
+        {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 
         {/* Result Details */}
-
         <div className="result-details w-[90%] m-auto mt-20">
-          <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
-            Result Details
-            <DialogForResultEdit resultExists={studentData?.result} />
-          </div>
-
-          {studentData?.result && (
-            <div className="filters flex flex-col gap-10 p-[25px]">
-              <div className="result h-full rounded-lg border">
-                <img src={studentData?.result} alt="result"></img>
-              </div>
-            </div>
-          )}
-
-          {/* Result Graph */}
-
-          {/* <div className="result-graph w-full h-[400px]">
-              <StudentProgressGraph results={studentData?.results} />
-            </div> */}
+          <Result studentData={studentData} />
         </div>
 
-        {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
+        {/* Result Graph */}
+        {/* <div className="result-graph w-full h-[400px]">
+              <StudentProgressGraph results={studentData?.results} />
+            </div> */}
+      </div>
 
-        {/* Attendence details */}
-        {/* <div className="attendence-details w-[90%] m-auto mt-20">
+      {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
+      {/* Attendence details */}
+      {/* <div className="attendence-details w-[90%] m-auto mt-20">
             <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
               Attendence Details
               <DialogForAttendenceEdit
@@ -733,47 +785,49 @@ const StudentProfile = () => {
                 setStudentData={setStudentData}
               />
             </div> */}
-
-        {/* Attendence Graph */}
-        {/* <div className="result-graph w-full h-[400px] mb-10">
+      {/* Attendence Graph */}
+      {/* <div className="result-graph w-full h-[400px] mb-10">
               <AttendanceMonitoringGraph
                 attendanceData={studentData?.attendence}
               />
             </div>
           </div> */}
-
-        {/* comment section */}
-
-        <div className="result-details w-[90%] m-auto mt-20">
-          <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
-            Remarks about student
-          </div>
-          <div>
-            <TextareaComponent
-              name="comment"
-              placeholder="Write comment about the student"
-              value={studentData?.comment}
-              handleInputChange={handleInputChange}
-            />
-          </div>
+      {/* comment section */}
+      <div className="result-details w-[90%] m-auto mt-20">
+        <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
+          Remarks about student
         </div>
+        <div>
+          <TextareaComponent
+            name="comment"
+            placeholder="Write comment about the student"
+            value={studentData?.comment}
+            handleInputChange={handleInputChange}
+          />
+        </div>
+      </div>
+      {/* -------------------------------------------------------------------------------------------- */}
+      {/* Sponsors Details  */}
 
-        {/* Download Profile option */}
-        <div className="download-profile w-[90%] m-auto mt-32">
-          <div className="w-full flex justify-center gap-5 text-2xl font-semibold text-primary mb-5">
-            <DialogForPdfPreview studentData={studentData} />
-            {studentDataChanged && (
-              <Button onClick={handleSaveChanges}>
-                <CheckIcon /> <span className="ml-2"> Save Changes</span>
-              </Button>
-            )}
-            <div>
-              <AlertForDialogDeletion handleClick={handleDeleteStudent} />
-            </div>
+      {/* Download Profile option */}
+      <div className="download-profile w-[90%] m-auto mt-32">
+        <div className="w-full flex justify-center gap-5 text-2xl font-semibold text-primary mb-5">
+          <DialogForPdfPreview studentData={studentData} />
+          {studentDataChanged && (
+            <Button onClick={handleSaveChanges}>
+              <CheckIcon /> <span className="ml-2"> Save Changes</span>
+            </Button>
+          )}
+          <div>
+            <AlertForDialogDeletion
+              handleClick={handleDeleteStudent}
+              text={" student "}
+            />
           </div>
         </div>
       </div>
     </div>
+    // </div>
   );
 };
 

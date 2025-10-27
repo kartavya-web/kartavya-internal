@@ -21,10 +21,12 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  result: {
-    type: String,
-    required: false,
-  },
+  result: [
+    {
+      sessionTerm: String,
+      url: String
+    }
+  ],
   class: {
     type: String,
     required: false,
