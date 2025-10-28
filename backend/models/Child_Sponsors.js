@@ -33,7 +33,7 @@ const sponsorSchema = new mongoose.Schema({
     Sponsored_child: [{
         type: mongoose.Schema.Types.ObjectId,
         required: false,
-        ref:'Students'
+        ref:'Student'
     }],
     payment_status: {
         type: Boolean,

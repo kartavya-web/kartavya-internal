@@ -21,10 +21,12 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  result: {
-    type: String,
-    required: false,
-  },
+  result: [
+    {
+      sessionTerm: String,
+      url: String
+    }
+  ],
   class: {
     type: String,
     required: false,
@@ -122,4 +124,5 @@ const studentSchema = new mongoose.Schema({
   },
 }, {timestamps: true});
 
-module.exports = mongoose.model("Student", studentSchema);
+const StudentModel = mongoose.model("Student", studentSchema);
+module.exports = StudentModel;

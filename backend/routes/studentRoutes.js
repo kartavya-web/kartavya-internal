@@ -53,6 +53,9 @@ router.route(`/:rollNumber/uploadResult`).patch(
   })
 );
 
+router.route(`/:rollNumber/deleteResult`)
+  .delete(studentController.deleteResult)
+
 router.route(`/:rollNumber/updateProfilePhoto`).patch(
   upload.single("profilePicture"), // Handle file upload
   asyncHandler(azure.uploadToAzureBlob),
