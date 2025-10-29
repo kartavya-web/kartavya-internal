@@ -81,6 +81,7 @@ export const Schools = [
   { label: "NIOS", value: "NIOS" },
   { label: "ISL Jhariya", value: "ISL Jhariya" },
   { label: "Dhanbad Public School", value: "Dhanbad Public School" },
+  { label: "Gurukul", value: "Gurukul" },
   { label: "Physics Wallah", value: "Physics Wallah" },
   { label: "Akash", value: "Akash" },
   { label: "Ram Krishna Public School", value: "Ram Krishna Public School" },
@@ -103,4 +104,9 @@ export const Gender = [
   { label: 'Male', value: 'Male'},
   { label: 'Female', value: 'Female'},
   { label: 'Other', value: 'Other'},
+];
+
+export const resultTermSession = [
+  "Mid Term 2025-26",
+  "End Term 2025-26",
 ];

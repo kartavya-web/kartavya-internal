@@ -7,6 +7,7 @@ const catchAsync = require("../Utils/catchAsync.js");
 const path = require("path");
 const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
+const { checkToken } = require("../middleware.js");
 
 const sanitizeFilename = (originalname) => {
   const ext = path.extname(originalname).toLowerCase(); // Get file extension
@@ -52,6 +53,11 @@ router.route(`/:rollNumber/uploadResult`).patch(
     await studentController.updateResult(req, res, resultUrl);
   })
 );
+
+router
+  .route(`/:rollNumber/deleteResult`)
+  .delete(studentController.deleteResult);
+
 router.route(`/:rollNumber/updateProfilePhoto`).patch(
   upload.single("profilePicture"), // Handle file upload
   asyncHandler(azure.uploadToAzureBlob),

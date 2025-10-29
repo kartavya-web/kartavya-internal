@@ -10,51 +10,63 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { toast } from "react-toastify";
 import { useParams } from "react-router";
+import { resultTermSession } from "@/constants/constants";
 
-const DialogForResultEdit = ({ resultExists }) => {
+const DialogForResultEdit = ({ studentData }) => {
   const { id } = useParams();
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const [result, setResult] = useState();
-  const handleResultChange = (e) => {
-    setResult(e.target.files[0]);
-  };
+  const [sessionTerm, setSessionTerm] = useState("");
+  const [resultFile, setResultFile] = useState(null);
+
+  const handleFileChange = (e) => setResultFile(e.target.files[0]);
 
   const handleResultSubmit = async () => {
+    if (!sessionTerm.trim()) {
+      toast.error("Please select a session and term");
+      return;
+    }
+    if (!resultFile) {
+      toast.error("Please select a result file to upload");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     setUploading(true);
-    const resultToSend = new FormData();
-    try {
-      if (result) {
-        resultToSend.append("result", result, result?.name);
-        resultToSend.append("pictureType", "resultPhoto");
-      }
 
+    const formData = new FormData();
+    formData.append("result", resultFile, resultFile.name);
+    formData.append("pictureType", "resultPhoto");
+    formData.append("sessionTerm", sessionTerm);
+
+    try {
       const res = await fetch(
         `/api/students/${encodeURIComponent(id)}/uploadResult`,
         {
           method: "PATCH",
-          body: resultToSend,
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          body: formData,
         }
       );
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to update student data");
+        throw new Error(errorData.message || "Failed to upload result");
       }
 
       const message = await res.json();
-      console.log(message, "message");
-
-      window.location.reload();
       toast.success(message.message);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       toast.error(`Error updating student data: ${error.message}`);
       setUploading(false);
@@ -65,34 +77,55 @@ const DialogForResultEdit = ({ resultExists }) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Pencil1Icon />{" "}
+          <Pencil1Icon />
           <span className="ml-2">
-            {resultExists ? "Edit result" : "Add result"}
+            Add / Edit Result
           </span>
         </Button>
       </DialogTrigger>
+
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {resultExists ? "Edit result" : "Add result"}
+            {studentData?.result?.length ? "Edit Result" : "Add Result"}
           </DialogTitle>
           <DialogDescription>
-            Make changes to result here. Click upload when you&apos;re done.
+            Select the session term and upload the result file. Click upload when done.
           </DialogDescription>
         </DialogHeader>
-        <div className="file-input-container mt-5">
-          <label className="file-input-label">
+
+        <div className="flex flex-col gap-4 mt-5">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Session Term
+            </label>
+            <Select onValueChange={setSessionTerm} value={sessionTerm}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Term-Session" />
+              </SelectTrigger>
+              <SelectContent>
+                {resultTermSession.map((term, idx) => (
+                  <SelectItem key={idx} value={term}>
+                    {term}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Result File</label>
             <Input
               type="file"
-              className="file-input"
-              onChange={handleResultChange}
-              accept="image/*"
+              onChange={handleFileChange}
+              accept="image/*,application/pdf"
             />
-          </label>
+          </div>
         </div>
-        <DialogFooter className="">
+
+        <DialogFooter>
           <Button type="submit" onClick={handleResultSubmit}>
-            {uploading ? "Uploading..." : "Upload result"}
+            {uploading ? "Uploading..." : "Upload Result"}
           </Button>
         </DialogFooter>
       </DialogContent>

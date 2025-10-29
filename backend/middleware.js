@@ -37,3 +37,7 @@ module.exports.authorizeAdmin = (req, res, next) => {
     next();
   });
 };
+
+// Backwards-compatible alias: some files import `checkVerified`
+// so export it pointing to the same middleware function.
+module.exports.checkVerified = module.exports.authorizeAdmin;

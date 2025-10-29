@@ -5,6 +5,10 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
+// Import models to ensure they are registered
+require("./models/Student");
+require("./models/Child_Sponsors");
+
 const { logger, logEvents } = require("./middleware/logger");
 const Errorhandler = require("./middleware/Errorhandler");
 const corsOptions = require("./config/corsOptions");
@@ -16,7 +20,8 @@ const {
 } = require("./middleware.js");
 
 const app = express();
-const PORT = process.env.PORT || 3500;
+// Default port set to 5000 to match frontend proxy / axios calls during local development
+const PORT = process.env.PORT || 5000;
 
 connectDB();
 
@@ -30,8 +35,6 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.use("/api/users", require("./routes/userRoutes"));
-
-app.use("/api/student-public", require("./routes/studentPublicRoutes.js"));
 
 app.use(
   "/api/students",

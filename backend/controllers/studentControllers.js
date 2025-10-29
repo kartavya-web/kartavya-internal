@@ -117,10 +117,10 @@ const getAllStudents = asyncHandler(async (req, res) => {
 const getStudentByRoll = asyncHandler(async (req, res) => {
   const rollNumber = req.params.rollNumber;
   const student = await Student.findOne({ rollNumber })
-    .populate("sponsorId", "name")
+    .populate("sponsorId", "name email batch")
     .exec();
 
-  // console.log(student, "student found");-----------------------------------------------------------
+  // console.log(student, "student found");
 
   if (!student) {
     return res.status(400).json({ message: "No Such Student found " });
@@ -169,7 +169,7 @@ const updateStudent = asyncHandler(async (req, res) => {
     !fathersName ||
     !centre
   ) {
-    // console.log("body", req.body);--------------------------------------------------
+    // console.log("body", req.body);
     return res
       .status(400)
       .json({ message: "Please fill the compulsory information" });
@@ -263,8 +263,8 @@ const updateStudent = asyncHandler(async (req, res) => {
 // @access Private
 const updateResult = asyncHandler(async (req, res, resultUrl) => {
   const rollNumber = req.params.rollNumber;
+  const { sessionTerm } = req.body;
 
-  // Validate required parameters
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
   }
@@ -273,27 +273,94 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     return res.status(400).json({ message: "Result not uploaded properly" });
   }
 
+  if (!sessionTerm) {
+    return res.status(400).json({ message: "Session term is required" });
+  }
+
   try {
     const student = await Student.findOne({ rollNumber }).exec();
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    const oldURL = student.result;
-    if (oldURL) {
-      await azure.deleteFromAzureBlob(oldURL);
+    if (!Array.isArray(student.result)) {
+      student.result = [];
     }
 
-    student.result = resultUrl;
+    const existingIndex = student.result.findIndex(
+      (r) => r.sessionTerm === sessionTerm
+    );
+
+    if (existingIndex !== -1) {
+      const oldURL = student.result[existingIndex].url;
+      if (oldURL) {
+        await azure.deleteFromAzureBlob(oldURL);
+      }
+      student.result[existingIndex].url = resultUrl;
+    } else {
+      student.result.push({ sessionTerm: sessionTerm, url: resultUrl });
+    }
+
     await student.save();
 
     res.status(200).json({
-      message: `Result of ${student.studentName} updated successfully.`,
+      message: `Result for "${sessionTerm}" of ${student.studentName} updated successfully.`,
     });
   } catch (error) {
     console.error("Error updating student result:", error);
     res.status(500).json({
       message: "Error updating the result of student",
+      error: error.message,
+    });
+  }
+});
+
+const deleteResult = asyncHandler(async (req, res) => {
+  const rollNumber = req.params.rollNumber;
+  const { sessionTerm } = req.body;
+
+  if (!rollNumber) {
+    return res.status(400).json({ message: "Roll Number required" });
+  }
+
+  if (!sessionTerm) {
+    return res.status(400).json({ message: "Session term required" });
+  }
+
+  try {
+    const student = await Student.findOne({ rollNumber }).exec();
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    if (!Array.isArray(student.result) || student.result.length === 0) {
+      return res.status(400).json({ message: "No results to delete" });
+    }
+
+    const index = student.result.findIndex(
+      (r) => r.sessionTerm === sessionTerm
+    );
+    if (index === -1) {
+      return res
+        .status(404)
+        .json({ message: "Result for this session term not found" });
+    }
+
+    const oldURL = student.result[index].url;
+    if (oldURL) {
+      await azure.deleteFromAzureBlob(oldURL);
+    }
+
+    student.result.splice(index, 1);
+    await student.save();
+
+    res.status(200).json({
+      message: `Result for "${sessionTerm}" of ${student.studentName} deleted successfully.`,
+    });
+  } catch (error) {
+    console.error("Error deleting student result:", error);
+    res.status(500).json({
+      message: "Error deleting the result of student",
       error: error.message,
     });
   }
@@ -405,44 +472,6 @@ const getBase64Image = asyncHandler(async (req, res) => {
   }
 });
 
-// --------------------------------------------------------------------
-// @desc Get all sponsors associated with a student
-// @route GET /students/:studentId/sponsors
-// @access Private
-const getSponsorsByStudentId = asyncHandler(async (req, res) => {
-  const { studentId } = req.params;
-
-  if (!studentId) {
-    return res.status(400).json({ message: "Student ID is required" });
-  }
-
-  const student = await Student.findOne({ rollNumber: studentId })
-    .populate("sponsorId", "name email batch")
-    .lean();
-
-  console.log(student);
-
-  if (!student) {
-    return res.status(404).json({ message: "Student not found" });
-  }
-
-  if (!student.sponsorId || student.sponsorId.length === 0) {
-    return res.status(200).json({
-      studentName: student.studentName,
-      rollNumber: student.rollNumber,
-      sponsors: [],
-      message: "No sponsors associated with this student",
-    });
-  }
-
-  res.status(200).json({
-    studentName: student.studentName,
-    rollNumber: student.rollNumber,
-    totalSponsors: student.sponsorId.length,
-    sponsors: student.sponsorId,
-  });
-});
-
 module.exports = {
   addNewStudent,
   getAllStudents,
@@ -450,7 +479,7 @@ module.exports = {
   updateStudent,
   deleteStudent,
   updateResult,
+  deleteResult,
   updateProfilePhoto,
   getBase64Image,
-  getSponsorsByStudentId,
 };
