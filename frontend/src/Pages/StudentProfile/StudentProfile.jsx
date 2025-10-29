@@ -24,7 +24,7 @@ import Result from "./Result";
 const StudentProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  console.log(id);
+  // console.log(id);
   const [studentData, setStudentData] = useState(null);
   const [sponsors, setSponsors] = useState(null);
   const [studentDataChanged, setStudentDataChanged] = useState(false);
@@ -32,7 +32,7 @@ const StudentProfile = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    // console.log("studentData", studentData);
+    console.log("studentData", studentData);
   }, [studentData]);
 
   useEffect(() => {
@@ -57,6 +57,7 @@ const StudentProfile = () => {
         const data = await response.json();
 
         setStudentData(data);
+        setSponsors(data.sponsorId);
       } catch (error) {
         toast.error("Error fetching student");
         console.error("Error fetching student data:", error);
@@ -67,36 +68,6 @@ const StudentProfile = () => {
 
     fetchStudentData();
   }, [id]);
-
-  // -------------------------------------------------------------------------------------------------
-  useEffect(() => {
-    const fetchSponsors = async () => {
-      try {
-        const response = await fetch(
-          `/api/student-public/${encodeURIComponent(id)}/sponsors`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok)
-          throw new Error(`Failed to fetch sponsors (${response.status})`);
-        const data = await response.json();
-        setSponsors(data.sponsors);
-      } catch (error) {
-        toast.error("Error fetching sponsors");
-        console.error("Error fetching sponsors:", error);
-      }
-    };
-
-    fetchSponsors();
-  }, [studentData]);
-
-  // ---------------------------------------------------------------------------------------------------
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -600,7 +571,7 @@ const StudentProfile = () => {
                 </p>
               )}
             </div>
-            {/* ----------------------------------------------------------------------------------- */}
+
             <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%] ">
               <label
                 htmlFor="isSponsored"
