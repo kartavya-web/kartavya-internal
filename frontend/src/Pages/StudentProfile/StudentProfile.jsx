@@ -32,7 +32,7 @@ const StudentProfile = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    // console.log("studentData", studentData);
+    console.log("studentData", studentData);
   }, [studentData]);
 
   useEffect(() => {
@@ -57,6 +57,7 @@ const StudentProfile = () => {
         const data = await response.json();
 
         setStudentData(data);
+        setSponsors(data.sponsorId);
       } catch (error) {
         toast.error("Error fetching student");
         console.error("Error fetching student data:", error);
@@ -67,41 +68,6 @@ const StudentProfile = () => {
 
     fetchStudentData();
   }, [id]);
-
-  // -------------------------------------------------------------------------------------------------
-  useEffect(() => {
-    const fetchSponsors = async () => {
-      const studentResp = await fetch(
-        `/api/students/${encodeURIComponent(id)}`
-      );
-      const studentDataRes = await studentResp.json();
-      try {
-        const response = await fetch(
-          `/api/students/${encodeURIComponent(studentDataRes._id)}/sponsors`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch sponsors");
-        const data = await response.json();
-        // console.log(data.sponsor);
-        setSponsors(data.sponsors);
-      } catch (error) {
-        toast.error("Error fetching sponsors 1");
-        console.error("Error fetching sponsors:", error);
-      }
-    };
-
-    fetchSponsors();
-    console.log("sponsors");
-    console.log(sponsors);
-  }, [studentData]);
-  // ---------------------------------------------------------------------------------------------------
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -229,9 +195,6 @@ const StudentProfile = () => {
                   className={`w-full outline-none rounded-lg font-semibold`}
                   onChange={handleInputChange}
                 >
-                  {/* <option value="" disabled>
-                    Select active status
-                  </option> */}
                   <option value={true}>Active</option>
                   <option value={false}>Inactive</option>
                 </select>
@@ -599,12 +562,6 @@ const StudentProfile = () => {
                           </p>
                         )}
                       </div>
-                      {/* <Button
-                        variant="destructive"
-                        onClick={() => handleDeallotSponsor(sponsor._id)}
-                      >
-                        Deallot
-                      </Button> */}
                     </div>
                   ))}
                 </div>
@@ -614,7 +571,7 @@ const StudentProfile = () => {
                 </p>
               )}
             </div>
-            {/* ----------------------------------------------------------------------------------- */}
+
             <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%] ">
               <label
                 htmlFor="isSponsored"
@@ -674,8 +631,8 @@ const StudentProfile = () => {
                 />
               </div>
             </div>
-
-            {/* <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
+          </div>
+          {/* <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
               <label
                 htmlFor="feesWePay"
                 className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -702,7 +659,7 @@ const StudentProfile = () => {
               </div>
             </div> */}
 
-            {/* <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
+          {/* <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
               <label
                 htmlFor="sponserName"
                 className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -721,7 +678,7 @@ const StudentProfile = () => {
               </div>
             </div> */}
 
-            {/* <div className="flex items-center w-full h-9 px-[2.5%]">
+          {/* <div className="flex items-center w-full h-9 px-[2.5%]">
               <label
                 htmlFor="amountBySponsor"
                 className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -740,7 +697,7 @@ const StudentProfile = () => {
               </div>
             </div> */}
 
-            {/* <div className="flex items-center w-full h-9 px-[2.5%]">
+          {/* <div className="flex items-center w-full h-9 px-[2.5%]">
               <label
                 htmlFor="amountBySponsor"
                 className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -749,7 +706,7 @@ const StudentProfile = () => {
               </label>
             </div> */}
 
-            {/* <div className="w-full flex items-center h-9 px-[2.5%] mt-5">
+          {/* <div className="w-full flex items-center h-9 px-[2.5%] mt-5">
               <div className="w-full flex flex-col gap-2 mt-2">
                 {temp.map((item, idx) => (
                   <div key={idx} className="flex justify-between">
@@ -759,10 +716,8 @@ const StudentProfile = () => {
                 ))}
               </div>
             </div> */}
-          </div>
+          {/* </div> */}
         </div>
-
-        {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
 
         {/* Result Details */}
         <div className="result-details w-[90%] m-auto mt-20">
@@ -773,11 +728,10 @@ const StudentProfile = () => {
         {/* <div className="result-graph w-full h-[400px]">
               <StudentProgressGraph results={studentData?.results} />
             </div> */}
-      </div>
 
-      {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
-      {/* Attendence details */}
-      {/* <div className="attendence-details w-[90%] m-auto mt-20">
+        {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
+        {/* Attendence details */}
+        {/* <div className="attendence-details w-[90%] m-auto mt-20">
             <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
               Attendence Details
               <DialogForAttendenceEdit
@@ -785,49 +739,47 @@ const StudentProfile = () => {
                 setStudentData={setStudentData}
               />
             </div> */}
-      {/* Attendence Graph */}
-      {/* <div className="result-graph w-full h-[400px] mb-10">
+        {/* Attendence Graph */}
+        {/* <div className="result-graph w-full h-[400px] mb-10">
               <AttendanceMonitoringGraph
                 attendanceData={studentData?.attendence}
               />
             </div>
           </div> */}
-      {/* comment section */}
-      <div className="result-details w-[90%] m-auto mt-20">
-        <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
-          Remarks about student
-        </div>
-        <div>
-          <TextareaComponent
-            name="comment"
-            placeholder="Write comment about the student"
-            value={studentData?.comment}
-            handleInputChange={handleInputChange}
-          />
-        </div>
-      </div>
-      {/* -------------------------------------------------------------------------------------------- */}
-      {/* Sponsors Details  */}
-
-      {/* Download Profile option */}
-      <div className="download-profile w-[90%] m-auto mt-32">
-        <div className="w-full flex justify-center gap-5 text-2xl font-semibold text-primary mb-5">
-          <DialogForPdfPreview studentData={studentData} />
-          {studentDataChanged && (
-            <Button onClick={handleSaveChanges}>
-              <CheckIcon /> <span className="ml-2"> Save Changes</span>
-            </Button>
-          )}
+        {/* comment section */}
+        <div className="result-details w-[90%] m-auto mt-20">
+          <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
+            Remarks about student
+          </div>
           <div>
-            <AlertForDialogDeletion
-              handleClick={handleDeleteStudent}
-              text={" student "}
+            <TextareaComponent
+              name="comment"
+              placeholder="Write comment about the student"
+              value={studentData?.comment}
+              handleInputChange={handleInputChange}
             />
+          </div>
+        </div>
+
+        {/* Download Profile option */}
+        <div className="download-profile w-[90%] m-auto mt-32">
+          <div className="w-full flex justify-center gap-5 text-2xl font-semibold text-primary mb-5">
+            <DialogForPdfPreview studentData={studentData} />
+            {studentDataChanged && (
+              <Button onClick={handleSaveChanges}>
+                <CheckIcon /> <span className="ml-2"> Save Changes</span>
+              </Button>
+            )}
+            <div>
+              <AlertForDialogDeletion
+                handleClick={handleDeleteStudent}
+                text={" student "}
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
-    // </div>
   );
 };
 

@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 import Sample from "@/components/Form/MultiSelect";
+import Sponsors from "./Pages/SponsorsList/Sponsors";
 
 import EnterStudentDetails from "./Pages/AddNewStudent/EnterStudentDetails";
 import StudentSpreadsheet from "./Pages/StudentSpreadsheet/StudentSpreadsheet.jsx";
@@ -29,6 +30,7 @@ const router = createBrowserRouter(
       <Route path="/allotment/addDonationsToCSM" element={<AddDonationsToCSM />} />
 
       <Route path="/hello" element={<Sample />} />
+      <Route path="/sponsors" element={<Sponsors />} />
 
       {/* Admin Routes */}
       <Route path="/admin/:id" element={<StudentProfile />} />
