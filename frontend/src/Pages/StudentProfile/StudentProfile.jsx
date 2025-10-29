@@ -32,7 +32,7 @@ const StudentProfile = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    console.log("studentData", studentData);
+    // console.log("studentData", studentData);
   }, [studentData]);
 
   useEffect(() => {
@@ -68,6 +68,42 @@ const StudentProfile = () => {
 
     fetchStudentData();
   }, [id]);
+
+  // -------------------------------------------------------------------------------------------------
+  useEffect(() => {
+    const fetchSponsors = async () => {
+      try {
+        const response = await fetch(
+          `/api/student-public/${encodeURIComponent(id)}/sponsors`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(
+            `Failed to fetch sponsors: ${response.status} → ${errText}`
+          );
+        }
+
+        const data = await response.json();
+        console.log("Fetched sponsors:", data);
+        setSponsors(data.sponsors);
+      } catch (error) {
+        console.error("Error fetching sponsors:", error);
+        toast.error("Error fetching sponsors");
+      }
+    };
+
+    if (id && token) fetchSponsors();
+  }, [id, token]);
+
+  // ---------------------------------------------------------------------------------------------------
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -571,7 +607,6 @@ const StudentProfile = () => {
                 </p>
               )}
             </div>
-
             <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%] ">
               <label
                 htmlFor="isSponsored"
@@ -718,7 +753,6 @@ const StudentProfile = () => {
             </div> */}
           {/* </div> */}
         </div>
-
         {/* Result Details */}
         <div className="result-details w-[90%] m-auto mt-20">
           <Result studentData={studentData} />
@@ -760,6 +794,8 @@ const StudentProfile = () => {
             />
           </div>
         </div>
+        {/* -------------------------------------------------------------------------------------------- */}
+        {/* Sponsors Details  */}
 
         {/* Download Profile option */}
         <div className="download-profile w-[90%] m-auto mt-32">
