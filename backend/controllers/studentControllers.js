@@ -472,6 +472,44 @@ const getBase64Image = asyncHandler(async (req, res) => {
   }
 });
 
+// --------------------------------------------------------------------
+// @desc Get all sponsors associated with a student
+// @route GET /students/:studentId/sponsors
+// @access Private
+const getSponsorsByStudentId = asyncHandler(async (req, res) => {
+  const { studentId } = req.params;
+
+  if (!studentId) {
+    return res.status(400).json({ message: "Student ID is required" });
+  }
+
+  const student = await Student.findById(studentId)
+    .populate("sponsorId", "name email batch")
+    .lean();
+
+  console.log(student);
+
+  if (!student) {
+    return res.status(404).json({ message: "Student not found" });
+  }
+
+  if (!student.sponsorId || student.sponsorId.length === 0) {
+    return res.status(200).json({
+      studentName: student.studentName,
+      rollNumber: student.rollNumber,
+      sponsors: [],
+      message: "No sponsors associated with this student",
+    });
+  }
+
+  res.status(200).json({
+    studentName: student.studentName,
+    rollNumber: student.rollNumber,
+    totalSponsors: student.sponsorId.length,
+    sponsors: student.sponsorId,
+  });
+});
+
 module.exports = {
   addNewStudent,
   getAllStudents,

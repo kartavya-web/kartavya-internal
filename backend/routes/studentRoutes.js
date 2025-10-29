@@ -66,5 +66,8 @@ router.route(`/:rollNumber/updateProfilePhoto`).patch(
     await studentController.updateProfilePhoto(req, res, profileUrl);
   })
 );
+// -----------------------------------------------------------------------------------------------
+// Get all sponsors associated with a student
+router.get("/:studentId/sponsors", studentController.getSponsorsByStudentId);
 
 module.exports = router;

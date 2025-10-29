@@ -69,42 +69,6 @@ const StudentProfile = () => {
     fetchStudentData();
   }, [id]);
 
-  // -------------------------------------------------------------------------------------------------
-  useEffect(() => {
-    const fetchSponsors = async () => {
-      try {
-        const response = await fetch(
-          `/api/student-public/${encodeURIComponent(id)}/sponsors`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errText = await response.text();
-          throw new Error(
-            `Failed to fetch sponsors: ${response.status} → ${errText}`
-          );
-        }
-
-        const data = await response.json();
-        console.log("Fetched sponsors:", data);
-        setSponsors(data.sponsors);
-      } catch (error) {
-        console.error("Error fetching sponsors:", error);
-        toast.error("Error fetching sponsors");
-      }
-    };
-
-    if (id && token) fetchSponsors();
-  }, [id, token]);
-
-  // ---------------------------------------------------------------------------------------------------
-
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -816,6 +780,7 @@ const StudentProfile = () => {
         </div>
       </div>
     </div>
+    // </div>
   );
 };
 
