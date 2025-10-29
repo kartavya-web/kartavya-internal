@@ -472,11 +472,6 @@ const getBase64Image = asyncHandler(async (req, res) => {
   }
 });
 
-// --------------------------------------------------------------------
-// @desc Get all sponsors associated with a student
-// @route GET /students/:studentId/sponsors
-// @access Private
-
 module.exports = {
   addNewStudent,
   getAllStudents,
