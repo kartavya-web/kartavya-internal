@@ -25,6 +25,7 @@ const StudentProfile = () => {
   const { id } = useParams();
 
   const [studentData, setStudentData] = useState(null);
+  const [sponsors, setSponsors] = useState([]);
   const [studentDataChanged, setStudentDataChanged] = useState(false);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
@@ -55,6 +56,7 @@ const StudentProfile = () => {
         const data = await response.json();
 
         setStudentData(data);
+        setSponsors(data.sponsorId);
       } catch (error) {
         toast.error("Error fetching student");
         console.error("Error fetching student data:", error);
@@ -549,6 +551,34 @@ const StudentProfile = () => {
             <div className="w-full text-2xl font-semibold text-primary mb-5">
               Sponsorship Details
             </div>
+            {/* Sponsors List */}
+            <div className="mt-4 pl-[2.5%] pr-[2.5%]">
+              <h3 className="text-xl font-semibold mb-3">Sponsors</h3>
+              {sponsors && sponsors.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {sponsors.map((sponsor, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center border p-2 rounded-lg bg-white"
+                    >
+                      <div>
+                        <p className="font-semibold">{sponsor.name}</p>
+                        <p className="text-sm text-gray-600">{sponsor.email}</p>
+                        {sponsor.batch && (
+                          <p className="text-sm text-gray-600">
+                            {sponsor.batch} Passout
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600 italic">
+                  No sponsors found for this student.
+                </p>
+              )}
+            </div>
 
             <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%] ">
               <label
@@ -609,7 +639,6 @@ const StudentProfile = () => {
                 />
               </div>
             </div>
-
           </div>
         </div>
 
@@ -617,11 +646,11 @@ const StudentProfile = () => {
         {/* Result Details */}
 
         <div className="result-details w-[90%] m-auto mt-20">
-          <Result studentData={studentData}/>
+          <Result studentData={studentData} />
         </div>
 
         {/* Result Graph */}
-          {/* <div className="result-graph w-full h-[400px]">
+        {/* <div className="result-graph w-full h-[400px]">
               <StudentProgressGraph results={studentData?.results} />
             </div> */}
         {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
@@ -670,7 +699,10 @@ const StudentProfile = () => {
               </Button>
             )}
             <div>
-              <AlertForDialogDeletion handleClick={handleDeleteStudent} text={" student "} />
+              <AlertForDialogDeletion
+                handleClick={handleDeleteStudent}
+                text={" student "}
+              />
             </div>
           </div>
         </div>
