@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/kartavya-web/kartavya-internal#readme",
   "description": "",
-  "dependencies": {
-    "concurrently": "^9.2.0"
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }

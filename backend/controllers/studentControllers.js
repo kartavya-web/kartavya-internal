@@ -51,7 +51,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     return res.status(400).json({ message: "Invalid Annual Income" });
   }
 
-  const lastStudent = await Student.findOne().sort({createdAt: -1});
+  const lastStudent = await Student.findOne().sort({ createdAt: -1 });
 
   // Extract the last sequence number and increment it
   let lastSequenceNumber = lastStudent
@@ -102,7 +102,9 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
 // @access Private
 const getAllStudents = asyncHandler(async (req, res) => {
   const students = await Student.find()
-    .select("studentName rollNumber class centre activeStatus sponsorshipStatus school")
+    .select(
+      "studentName rollNumber class centre activeStatus sponsorshipStatus school"
+    )
     .lean();
 
   res.json(students);
@@ -113,9 +115,11 @@ const getAllStudents = asyncHandler(async (req, res) => {
 // @access Private
 const getStudentByRoll = asyncHandler(async (req, res) => {
   const rollNumber = req.params.rollNumber;
-  const student = await Student.findOne({ rollNumber }).populate("sponsorId", "name").exec();
+  const student = await Student.findOne({ rollNumber })
+    .populate("sponsorId", "name email batch")
+    .exec();
 
-  console.log(student, "student found"); 
+  console.log(student, "student found");
 
   if (!student) {
     return res.status(400).json({ message: "No Such Student found " });
@@ -199,12 +203,12 @@ const updateStudent = asyncHandler(async (req, res) => {
       .json({ message: "Enter the remark for making the student inactive" });
   }
 
-  if (sponsorshipStatus == true && activeStatus == "false"){
-  return res
-    .status(400)
-    .json({ message: "The student is Inactive so can't be sponsored" });
+  if (sponsorshipStatus == true && activeStatus == "false") {
+    return res
+      .status(400)
+      .json({ message: "The student is Inactive so can't be sponsored" });
   }
-  
+
   if (sponsorshipPercent < 0 || sponsorshipPercent > 100) {
     return res.status(400).json({ message: "Invalid Sponsorship Percent" });
   }
@@ -332,9 +336,13 @@ const deleteResult = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "No results to delete" });
     }
 
-    const index = student.result.findIndex(r => r.sessionTerm === sessionTerm);
+    const index = student.result.findIndex(
+      (r) => r.sessionTerm === sessionTerm
+    );
     if (index === -1) {
-      return res.status(404).json({ message: "Result for this session term not found" });
+      return res
+        .status(404)
+        .json({ message: "Result for this session term not found" });
     }
 
     const oldURL = student.result[index].url;
@@ -356,8 +364,6 @@ const deleteResult = asyncHandler(async (req, res) => {
     });
   }
 });
-
-
 
 // @desc Update profilePhoto of a particular Student by rollNumber
 // @route PATCH/Students/:rollNumber
@@ -474,5 +480,5 @@ module.exports = {
   updateResult,
   deleteResult,
   updateProfilePhoto,
-  getBase64Image
+  getBase64Image,
 };
