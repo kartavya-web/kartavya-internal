@@ -1,22 +1,17 @@
 const asyncHandler = require("express-async-handler");
 const ChildSponsorMap = require("./../models/ChildSponsorMapSchema");
-const mongoose = require("mongoose");
 const Student = require("./../models/Student");
 const User = require("./../models/User");
 const generateEmailTemplate = require("../Utils/mailTemplate");
 const { sendEmail } = require("../Utils/mailer");
 
-// @desc Get all Donations
 // @route GET/api/allotment/
-// @access Private
 const getVerifiedDonations = asyncHandler(async (req, res) => {
   const verifiedDonations = await ChildSponsorMap.find({}).lean();
   res.json(verifiedDonations);
 });
 
-// @desc Get all Students who need Sponsor allotment
 // @route GET/api/allotment/action
-// @access Private
 const getChildTobeAlloted = asyncHandler(async (req, res) => {
   const sponsorid = req.headers["sponsorid"];
 
@@ -60,9 +55,7 @@ const sendAllotmentEmail = async (sponsor, student) => {
   console.log("Allotment email sent successfully!");
 };
 
-// @desc Allot Student to the Sponsor
 // @route PATCH /api/allotment/allot
-// @access Private
 const allotChild = asyncHandler(async (req, res) => {
   const { sponsorId, studentId } = req.body;
 
@@ -149,12 +142,12 @@ const allotChild = asyncHandler(async (req, res) => {
 const deAllotChild = asyncHandler(async (req, res) => {
   const { sponsorId, studentId } = req.body;
 
-  const sponsor = await User.findById(sponsorId).lean();
+  const sponsor = await User.findById(sponsorId).select("-hash -salt");
   if (!sponsor) {
     return res.status(404).json({ message: "Sponsor not found" });
   }
 
-  const student = await Student.findById(studentId).lean();
+  const student = await Student.findById(studentId);
   if (!student) {
     return res.status(404).json({ message: "Student not found" });
   }
@@ -165,6 +158,7 @@ const deAllotChild = asyncHandler(async (req, res) => {
   student.sponsorId = student.sponsorId.filter(
     (sId) => sId.toString() !== sponsorId.toString()
   );
+
   await sponsor.save();
   await student.save();
 
@@ -173,9 +167,7 @@ const deAllotChild = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc Add Donation to ChildSponsorMap
 // @route POST /api/allotment/add-donation
-// @access Private
 const addDonationsToCSM = asyncHandler(async (req, res) => {
   const { user, name, donations } = req.body;
 
