@@ -1,12 +1,11 @@
 const Student = require("../models/Student");
+const User = require("../models/User");
 const azure = require("../azureStorage");
 const asyncHandler = require("express-async-handler");
 const { get } = require("https");
 const { get: httpGet } = require("http");
 
-// @desc Create New Student
 // @route POST/Students
-// @access Private
 const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
   const {
     studentName,
@@ -97,9 +96,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
   }
 });
 
-// @desc Get all Students
 // @route GET/Students
-// @access Private
 const getAllStudents = asyncHandler(async (req, res) => {
   const students = await Student.find()
     .select(
@@ -110,9 +107,7 @@ const getAllStudents = asyncHandler(async (req, res) => {
   res.json(students);
 });
 
-// @desc Get a particular Student by rollNumber
 // @route GET/Students/:rollNumber
-// @access Private
 const getStudentByRoll = asyncHandler(async (req, res) => {
   const rollNumber = req.params.rollNumber;
   const student = await Student.findOne({ rollNumber })
@@ -124,12 +119,22 @@ const getStudentByRoll = asyncHandler(async (req, res) => {
   if (!student) {
     return res.status(400).json({ message: "No Such Student found " });
   }
-  res.json(student);
+
+  const sponsors = await User.find(
+    { _id: { $in: student.sponsorId } },
+    { name: 1, email: 1, _id: 1 }
+  ).lean();
+
+  // attach sponsors' info
+  const studentData = {
+    ...student.toObject(),
+    sponsors,
+  };
+
+  res.json(studentData);
 });
 
-// @desc Update a particular Student by rollNumber
 // @route PATCH/Students
-// @access Private
 const updateStudent = asyncHandler(async (req, res) => {
   const {
     rollNumber,
@@ -257,9 +262,7 @@ const updateStudent = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc Update Result of a particular Student by rollNumber
 // @route PUT/Students
-// @access Private
 const updateResult = asyncHandler(async (req, res, resultUrl) => {
   const rollNumber = req.params.rollNumber;
   const { sessionTerm } = req.body;
@@ -365,9 +368,7 @@ const deleteResult = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc Update profilePhoto of a particular Student by rollNumber
 // @route PATCH/Students/:rollNumber
-// @access Private
 const updateProfilePhoto = asyncHandler(async (req, res, profileUrl) => {
   const rollNumber = req.params.rollNumber;
 
@@ -407,9 +408,7 @@ const updateProfilePhoto = asyncHandler(async (req, res, profileUrl) => {
   }
 });
 
-// @desc Delete a particular Student by rollNumber
 // @route DELETE/Students/:rollNumber
-// @access Private
 const deleteStudent = asyncHandler(async (req, res) => {
   const rollNumber = req.params.rollNumber;
 
@@ -432,9 +431,7 @@ const deleteStudent = asyncHandler(async (req, res) => {
   res.json({ message: "Student Deleted" });
 });
 
-// @desc Get base64 image from URL
 // @route GET /students/get-base64-image?url=IMAGE_URL
-// @access Private/Public (as per your usage)
 const getBase64Image = asyncHandler(async (req, res) => {
   const imageUrl = req.query.url;
   if (!imageUrl) return res.status(400).send("Missing image URL");

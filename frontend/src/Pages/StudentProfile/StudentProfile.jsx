@@ -14,11 +14,22 @@ import DialogForProfilePhotoUpdate from "../../components/Dialogs/DialogForProfi
 import AuthVerify from "@/helper/jwtVerify";
 import Loader from "@/components/Loader";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import TextareaComponent from "@/components/Form/TextareaComponent";
 import { Link } from "react-router-dom";
 import { Centres, Gender, Schools } from "@/constants/constants";
 import Result from "./Result";
+
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 const StudentProfile = () => {
   const navigate = useNavigate();
@@ -28,6 +39,7 @@ const StudentProfile = () => {
   const [sponsors, setSponsors] = useState([]);
   const [studentDataChanged, setStudentDataChanged] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isdealloting, setIsdealloting] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -118,8 +130,8 @@ const StudentProfile = () => {
   };
 
   // delete student
-  const handleDeleteStudent = async (e) => {
-    e.preventDefault();
+  const handleDeleteStudent = async () => {
+    setIsdealloting(true);
     try {
       const res = await fetch(`/api/students/${encodeURIComponent(id)}`, {
         method: "DELETE",
@@ -138,6 +150,39 @@ const StudentProfile = () => {
     } catch (e) {
       toast.error(`Error deleting student data: ${e.message}`);
       return;
+    }
+  };
+
+  const handleDeAllotment = async (sponsorId) => {
+    try {
+      const res = await fetch(`/api/allotment/deallot`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ sponsorId, studentId: studentData._id }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to deallot sponsor");
+      }
+      const message = await res.json();
+      toast.success(message.message);
+
+      // Refresh student data to reflect changes
+      const updatedStudentData = { ...studentData };
+      updatedStudentData.sponsors = updatedStudentData.sponsors.filter(
+        (sponsor) => sponsor._id !== sponsorId
+      );
+      setStudentData(updatedStudentData);
+      // Refresh sponsors data to reflect changes
+      setSponsors(updatedStudentData.sponsors);
+    } catch (e) {
+      toast.error(`Error dealloting sponsor: ${e.message}`);
+      return;
+    } finally {
+      setIsdealloting(false);
     }
   };
 
@@ -570,6 +615,41 @@ const StudentProfile = () => {
                           </p>
                         )}
                       </div>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            disabled={isdealloting}
+                          >
+                            Deallot
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Confirm Deallotment
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to deallot{" "}
+                              <span className="font-semibold">
+                                {sponsor.name}
+                              </span>
+                              ? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeAllotment(sponsor._id)}
+                              className="bg-destructive text-white hover:bg-destructive/90"
+                            >
+                              Confirm
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   ))}
                 </div>
@@ -641,7 +721,6 @@ const StudentProfile = () => {
             </div>
           </div>
         </div>
-
         {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
         {/* Result Details */}
 
@@ -700,7 +779,7 @@ const StudentProfile = () => {
             )}
             <div>
               <AlertForDialogDeletion
-                handleClick={handleDeleteStudent}
+                handleClick={() => handleDeleteStudent()}
                 text={" student "}
               />
             </div>
