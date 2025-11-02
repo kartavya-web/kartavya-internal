@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Sponsor = require("../models/User"); 
 const jwt = require("jsonwebtoken");
 
 const loginUser = async (req, res) => {
@@ -83,8 +84,6 @@ const getUserById = async (req, res) => {
     });
   }
 }
-const Sponsor = require("../models/Child_Sponsors"); 
-const Student = require("../models/Student");
 
 // GET /api/users/sponsors  -> returns sponsors populated with students
 const getAllSponsors = async (req, res) => {
@@ -129,68 +128,9 @@ const getSponsorById = async (req, res) => {
   }
 };
 
-// POST /api/users/sponsors  -> create sponsor
-const createSponsor = async (req, res) => {
-  try {
-    const newSponsor = new Sponsor(req.body);
-    await newSponsor.save();
-    res.status(201).json({ message: "Sponsor created", sponsor: newSponsor });
-  } catch (err) {
-    console.error("createSponsor error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-};
-
-// POST /api/users/sponsors/:sponsorId/assign/:studentId  -> assign student to sponsor
-const assignStudentToSponsor = async (req, res) => {
-  const { sponsorId, studentId } = req.params;
-  try {
-    const sponsor = await Sponsor.findById(sponsorId);
-    const student = await Student.findById(studentId);
-    if (!sponsor || !student) return res.status(404).json({ message: "Sponsor or Student not found" });
-
-    // add student id to sponsor.Sponsored_child if not present
-    if (!sponsor.Sponsored_child.some(id => id.toString() === studentId.toString())) {
-      sponsor.Sponsored_child.push(studentId);
-      await sponsor.save();
-    }
-
-    // update student.sponsorId (your schema uses array; adjust if single id)
-    if (!student.sponsorId) student.sponsorId = [];
-    if (!student.sponsorId.some(id => id.toString() === sponsorId.toString())) {
-      student.sponsorId.push(sponsor._id);
-    }
-    student.sponsorshipStatus = true;
-    await student.save();
-
-    res.status(200).json({ message: "Student assigned to sponsor" });
-  } catch (err) {
-    console.error("assignStudentToSponsor error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-};
-
-// GET /api/users/students  -> return basic student list
-const getAllStudents = async (req, res) => {
-  try {
-    const students = await Student.find()
-      .select("studentName class centre sponsorshipStatus sponsorId profilePhoto")
-      .populate("sponsorId", "sponsor_name E_mail_id")
-      .lean();
-    res.status(200).json(students);
-  } catch (err) {
-    console.error("getAllStudents error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-};
-
-
 module.exports = {
   loginUser,
   getUserById,
   getAllSponsors,
   getSponsorById,
-  createSponsor,
-  assignStudentToSponsor,
-  getAllStudents,
 };

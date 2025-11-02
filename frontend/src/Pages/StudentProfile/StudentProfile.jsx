@@ -14,7 +14,6 @@ import DialogForProfilePhotoUpdate from "../../components/Dialogs/DialogForProfi
 import AuthVerify from "@/helper/jwtVerify";
 import Loader from "@/components/Loader";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import TextareaComponent from "@/components/Form/TextareaComponent";
 import { Link } from "react-router-dom";
 import { Centres, Gender, Schools } from "@/constants/constants";
@@ -118,8 +117,7 @@ const StudentProfile = () => {
   };
 
   // delete student
-  const handleDeleteStudent = async (e) => {
-    e.preventDefault();
+  const handleDeleteStudent = async () => {
     try {
       const res = await fetch(`/api/students/${encodeURIComponent(id)}`, {
         method: "DELETE",
@@ -137,6 +135,35 @@ const StudentProfile = () => {
       toast.success("Student deleted successfully!");
     } catch (e) {
       toast.error(`Error deleting student data: ${e.message}`);
+      return;
+    }
+  };
+
+  const handleDeAllotment = async (sponsorId) => {
+    try {
+      const res = await fetch(`/api/allotment/deallot`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ sponsorId, studentId: studentData._id }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to deallot sponsor");
+      }
+      const message = await res.json();
+      toast.success(message.message);
+
+      // Refresh student data to reflect changes
+      const updatedStudentData = { ...studentData };
+      updatedStudentData.sponsors = updatedStudentData.sponsors.filter(
+        (sponsor) => sponsor._id !== sponsorId
+      );
+      setStudentData(updatedStudentData);
+    } catch (e) {
+      toast.error(`Error dealloting sponsor: ${e.message}`);
       return;
     }
   };
@@ -641,7 +668,6 @@ const StudentProfile = () => {
             </div>
           </div>
         </div>
-
         {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
         {/* Result Details */}
 
@@ -700,7 +726,7 @@ const StudentProfile = () => {
             )}
             <div>
               <AlertForDialogDeletion
-                handleClick={handleDeleteStudent}
+                handleClick={() => handleDeleteStudent()}
                 text={" student "}
               />
             </div>
