@@ -100,15 +100,14 @@ const allotChild = asyncHandler(async (req, res) => {
       { _id: studentId },
       { $addToSet: { sponsorId: sponsorId } }
     );
-    
+
     // Decrement numChild in the first donation object
     firstDonation.numChild -= 1;
 
     if (firstDonation.numChild > 0) {
       // Still children left in this donation → just save
       await donationObject.save();
-    }
-    else if (firstDonation.numChild === 0) {
+    } else if (firstDonation.numChild === 0) {
       // Remove this donation from the array
       donationObject.donations = donationObject.donations.filter(
         (donation) =>
@@ -123,7 +122,9 @@ const allotChild = asyncHandler(async (req, res) => {
         await donationObject.save();
       } else {
         // No donations left → remove the entire document
-        console.log("Removing entire ChildSponsorMap document as no donations left");
+        console.log(
+          "Removing entire ChildSponsorMap document as no donations left"
+        );
         await ChildSponsorMap.deleteOne({ _id: donationObject._id });
       }
     }
@@ -181,8 +182,10 @@ const addDonationsToCSM = asyncHandler(async (req, res) => {
 
   console.log(existingDonationId, "existingDonationId");
 
-  if(existingDonationId) {
-    return res.status(400).json({ message: "This donation already exists in CSM Table." });
+  if (existingDonationId) {
+    return res
+      .status(400)
+      .json({ message: "This donation already exists in CSM Table." });
   }
 
   const rawDonation = donations[0];
