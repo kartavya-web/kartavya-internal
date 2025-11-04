@@ -122,6 +122,10 @@ const studentSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  profileAadharVerified:{
+    type: Boolean,
+    default: false,
+  }
 }, {timestamps: true});
 
 const StudentModel = mongoose.model("Student", studentSchema);

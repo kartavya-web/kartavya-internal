@@ -100,7 +100,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
 const getAllStudents = asyncHandler(async (req, res) => {
   const students = await Student.find()
     .select(
-      "studentName rollNumber class centre activeStatus sponsorshipStatus school"
+      "studentName rollNumber class centre activeStatus sponsorshipStatus school profileAadharVerified"
     )
     .lean();
 
@@ -163,6 +163,7 @@ const updateStudent = asyncHandler(async (req, res) => {
     singleParent,
     relevantCertificate,
     comment,
+    profileAadharVerified,
   } = req.body;
 
   if (
@@ -246,6 +247,7 @@ const updateStudent = asyncHandler(async (req, res) => {
         disability,
         singleParent,
         relevantCertificate,
+        profileAadharVerified,
         comment,
       }
     );

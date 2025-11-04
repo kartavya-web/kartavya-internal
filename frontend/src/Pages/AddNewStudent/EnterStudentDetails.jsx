@@ -35,6 +35,7 @@ const EnterStudentDetails = () => {
     address: "",
     annualIncome: 0,
     activeStatus: true,
+    profileAadharVerified: false,
     aadhar: false,
     domicile: false,
     birthCertificate: false,
@@ -177,6 +178,13 @@ const EnterStudentDetails = () => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
+                  <CheckboxComponent
+                    title="Profile Aadhar Verified"
+                    name="profileAadharVerified"
+                    checked={formData.profileAadharVerified}
+                    handleChange={handleInputChange}
+                  />
+                  
                   <CheckboxComponent
                     title="Aadhar Card"
                     name="aadhar"

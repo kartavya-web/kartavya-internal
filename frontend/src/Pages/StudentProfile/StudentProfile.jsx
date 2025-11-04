@@ -432,6 +432,27 @@ const StudentProfile = () => {
             <div className="w-full text-2xl font-semibold text-primary mb-5">
               Document Details
             </div>
+            <div className="flex items-center space-x-2 pl-[2.5%] pr-[2.5%] ">
+              <Checkbox
+                id="profileAadharVerified"
+                checked={studentData?.profileAadharVerified}
+                onCheckedChange={(checked) =>
+                  handleInputChange({
+                    target: {
+                      name: "profileAadharVerified",
+                      type: "checkbox",
+                      checked: checked,
+                    },
+                  })
+                }
+              />
+              <label
+                htmlFor="profileAadharVerified"
+                className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Profile Aadhar Verified
+              </label>
+            </div>
             {/* Aadhar Details */}
             <div className="flex items-center space-x-2 pl-[2.5%] pr-[2.5%] ">
               <Checkbox

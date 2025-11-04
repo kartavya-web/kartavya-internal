@@ -13,26 +13,33 @@ const StudentTable = ({ filteredStudents }) => {
     <Table className="w-[95%] relative">
       <TableHeader className="w-full">
         <TableRow className="w-full text-muted-foreground">
-          <TableHead className="pl-2 w-1/6">Name</TableHead>
-          <TableHead className="w-1/6">Class</TableHead>
-          <TableHead className="w-1/6">Center</TableHead>
-          <TableHead className="w-1/6">Active Status</TableHead>
-          <TableHead className="w-1/6">Sponsored</TableHead>
-          <TableHead className="w-1/6">School</TableHead>
+          <TableHead className="pl-2 w-[25%]">Name</TableHead>
+          <TableHead className="w-auto">Class</TableHead>
+          <TableHead className="w-auto">Center</TableHead>
+          <TableHead className="w-auto">Active Status</TableHead>
+          <TableHead className="w-auto">Sponsored</TableHead>
+          <TableHead className="w-[20%]">School</TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
         {filteredStudents?.map((student) => (
-          <TableRow key={student._id} className="w-full hover:bg-gray-100">
-            <TableCell className="w-1/6">
+          <TableRow key={student._id} className="hover:bg-gray-100">
+            <TableCell className="w-[25%]">
               <Link
                 to={`/admin/${encodeURIComponent(student.rollNumber)}`}
                 className="flex items-center h-full pl-2"
               >
                 <div className="font-medium">{student.studentName}</div>
+                {student.profileAadharVerified && (
+                  <span
+                    className="inline-block w-2 h-2 ml-2 rounded-full bg-green-600"
+                    title="Verified"
+                  />
+                )}
               </Link>
             </TableCell>
-            <TableCell className="w-1/6">
+            <TableCell className="w-auto">
               <Link
                 to={`/admin/${encodeURIComponent(student.rollNumber)}`}
                 className="flex items-center h-full"
@@ -40,7 +47,7 @@ const StudentTable = ({ filteredStudents }) => {
                 {student.class}
               </Link>
             </TableCell>
-            <TableCell className="w-1/6">
+            <TableCell className="w-auto">
               <Link
                 to={`/admin/${encodeURIComponent(student.rollNumber)}`}
                 className="flex items-center h-full"
@@ -48,7 +55,7 @@ const StudentTable = ({ filteredStudents }) => {
                 {student.centre}
               </Link>
             </TableCell>
-            <TableCell className="w-1/6">
+            <TableCell className="w-auto">
               <Link
                 to={`/admin/${encodeURIComponent(student.rollNumber)}`}
                 className={`flex items-center h-full font-semibold ${
@@ -58,7 +65,7 @@ const StudentTable = ({ filteredStudents }) => {
                 {student.activeStatus ? "Active" : "Inactive"}
               </Link>
             </TableCell>
-            <TableCell className="w-1/6">
+            <TableCell className="w-auto">
               <Link
                 to={`/admin/${encodeURIComponent(student.rollNumber)}`}
                 className={`flex items-center h-full font-semibold ${
@@ -68,7 +75,7 @@ const StudentTable = ({ filteredStudents }) => {
                 {student.sponsorshipStatus ? "Yes" : "No"}
               </Link>
             </TableCell>
-            <TableCell className="w-1/6">
+            <TableCell className="w-[20%]">
               <Link
                 to={`/admin/${encodeURIComponent(student.rollNumber)}`}
                 className="flex items-center h-full"

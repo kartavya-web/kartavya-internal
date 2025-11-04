@@ -92,7 +92,8 @@ export const Schools = [
   { label: "DPS Hirak", value: "DPS Hirak" },
   { label: "Dr. JK Sinha Memorial (ISL)", value: "Dr. JK Sinha Memorial (ISL)" },
   { label: "ISL Jharia", value: "ISL Jharia" },
-  { label: "St. Xavier", value: "St. Xavier" }
+  { label: "St. Xavier", value: "St. Xavier" },
+  { label: "Middle School Dhaiya", value: "Middle School Dhaiya" }
 ];
 
 export const ActiveStatus = [

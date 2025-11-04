@@ -54,7 +54,18 @@ const SpreadsheetBody = ({ studentData }) => {
             onChange={handleInputChange}
             className="rounded-lg p-2 w-[30%]"
           />
-          <div> Student Count : <span className="font-bold">{studentsSearchedByName?.length}</span></div>
+          <div>
+            {" "}
+            Student Count :{" "}
+            <span className="font-bold">{studentsSearchedByName?.length}</span>
+          </div>
+          <div>
+            <span
+              className="inline-block w-2 h-2 mr-2 rounded-full bg-green-600"
+              title="Verified"
+            />
+            Aadhar Verified
+          </div>
         </div>
       </div>
       <div className="w-full flex justify-center items-center">
