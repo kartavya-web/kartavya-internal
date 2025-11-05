@@ -28,6 +28,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     disability,
     singleParent,
     relevantCertificate,
+    profileAadharVerified,
   } = req.body;
 
   if (!studentName || !gender || !dob || !fathersName || !centre) {
@@ -84,6 +85,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     disability,
     singleParent,
     relevantCertificate,
+    profileAadharVerified
   };
 
   const stud = await Student.create(studentObject);
