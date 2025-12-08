@@ -92,7 +92,7 @@ const getAllSponsors = async (req, res) => {
     const sponsors = await User.find()
       .populate({
         path: "sponsoredStudents",
-        select: "studentName class centre profilePhoto sponsorshipStatus"
+        select: "studentName rollNumber class centre school profilePhoto sponsorshipStatus"
       })
       .select('name email contactNumber dateOfBirth gender currentJob totalDonation sponsoredStudents profileImage')
       .lean();
