@@ -16,7 +16,7 @@ export default function LoginUser() {
     if (AuthVerify()) {
       navigate("/");
     }
-  });
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +42,7 @@ export default function LoginUser() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      navigate("/student-spreadsheet");
+      navigate("/");
       console.log("Login Successful:", data);
     } catch (error) {
       console.error("Login Error:", error.message);
