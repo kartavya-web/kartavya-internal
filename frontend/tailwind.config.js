@@ -4,6 +4,10 @@ export default {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
   	extend: {
+			fontFamily: {
+        playpen: ["Playpen Sans", "cursive"],
+        garamond: ["Cormorant Garamond", "serif"],
+      },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
