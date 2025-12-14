@@ -1,0 +1,227 @@
+@import url("https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap");
+
+
+
+.kartavya_logo {
+  height: fit-content;
+  width: 22%;
+  margin-left: 10rem;
+  margin-top: 2rem;
+}
+
+.Login_button {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #a1e1e0;
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  height: 4rem;
+  width: 11rem;
+  border-radius: 20px;
+  padding: 5px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  font-weight: 645;
+  z-index: 1;
+}
+
+.title_container {
+  font-size: 95px;
+  margin-left: 8%;
+  display: flex;
+  flex-direction: column;
+  margin-top: -2%;
+}
+
+.title {
+  margin: 0px;
+  padding: 0px;
+  height: 85px;
+  font-weight: 700;
+}
+
+.Monitoring {
+  position: absolute;
+  top: 15%;
+  right: 12%;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1.5rem;
+  margin-left: 8%;
+  margin-top: 8%;
+}
+
+.primary-btn {
+  background: #a1e1e0;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1.5px solid #000;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hero-image-section{
+  position: relative;
+  width: 100%;
+  margin-top: 10%;
+}
+
+.hero_img {
+  width: 100vw;
+}
+
+.hero_desc {
+  position: absolute;
+  top: 38%;
+  left: 8%;
+  max-width: 360px;
+  font-size: 2.5rem;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+}
+
+
+.dashboard {
+  padding: 4rem 6rem;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+.dashboard-title {
+  text-align: center;
+  font-size: 60px;
+  font-weight: 700;
+  margin-bottom: 3rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.dashboard-card {
+  border: 1.5px solid #222;
+  border-radius: 16px;
+  padding: 2rem;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-icon {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+
+.dashboard-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.dashboard-card p {
+  font-size: 16px;
+  color: #555;
+}
+
+.about-container {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #fde4be;
+  padding: 4rem 6rem;
+  gap: 4rem;
+}
+
+.about-image-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+.about-image {
+  position: relative;
+  width: 100%;
+  border-radius: 26px;
+  z-index: 1;
+  object-fit: cover;
+}
+
+.about-content h2 {
+  font-size: 56px;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.about-content p {
+  font-size: 20px;
+  line-height: 1.6;
+  max-width: 520px;
+  font-family: "Playpen Sans", cursive;
+  font-weight: 400;
+  font-size: 1.6rem;
+}
+
+@media (max-width: 900px) {
+  .about-container {
+    grid-template-columns: 1fr;
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  .about-image-wrapper {
+    margin: 0 auto;
+  }
+
+  .about-content h2 {
+    font-size: 42px;
+  }
+
+  .about-content p {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard {
+    padding: 2rem;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-title {
+    font-size: 34px;
+  }
+}

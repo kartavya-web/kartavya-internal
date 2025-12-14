@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const AllotmentHomePage = () => {
   return (
     <div>
-      <Link to="/student-spreadsheet">
+      <Link to="/">
         <Button className="m-5"><Home></Home> HomePage</Button>
       </Link>
       <div className="header text-3xl font-semibold text-center mt-5">
