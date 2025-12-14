@@ -14,7 +14,7 @@ export default function LoginUser() {
 
   useEffect(() => {
     if (AuthVerify()) {
-      navigate("/student-spreadsheet");
+      navigate("/");
     }
   });
 

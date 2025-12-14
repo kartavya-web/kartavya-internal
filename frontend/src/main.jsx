@@ -7,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 import Sample from "@/components/Form/MultiSelect";
 import Sponsors from "./Pages/SponsorsList/Sponsors";
-
 import EnterStudentDetails from "./Pages/AddNewStudent/EnterStudentDetails";
 import StudentSpreadsheet from "./Pages/StudentSpreadsheet/StudentSpreadsheet.jsx";
 import StudentProfile from "./Pages/StudentProfile/StudentProfile";
@@ -17,18 +16,21 @@ import AllotmentHomePage from "./Pages/SponsorAllotment/AllotmentHomePage";
 import AllotChild from "./Pages/SponsorAllotment/AllotChild";
 import { SponsorProvider } from "./context/SponsorContext";
 import AddDonationsToCSM from "./Pages/SponsorAllotment/AddDonationsToCSM";
+import App from "./App";
+
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/">
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<App />} />
+      <Route index element={<HomePage />} />
       <Route path="/login" element={<LoginUser />} />
       <Route path="/enter-student-details" element={<EnterStudentDetails />} />
       <Route path="/student-spreadsheet" element={<StudentSpreadsheet />} />
       <Route path="/allotment" element={<AllotmentHomePage />} />
       <Route path="/allotment/action" element={<AllotChild />} />
       <Route path="/allotment/addDonationsToCSM" element={<AddDonationsToCSM />} />
-
       <Route path="/hello" element={<Sample />} />
       <Route path="/sponsors" element={<Sponsors />} />
 
