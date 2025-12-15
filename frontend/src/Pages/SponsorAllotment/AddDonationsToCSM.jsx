@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import AuthVerify from "@/helper/jwtVerify";
 
 const AddDonationsToCSM = () => {
   const navigate = useNavigate();
@@ -14,6 +15,12 @@ const AddDonationsToCSM = () => {
   const [date, setDate] = useState("");
   const [numChild, setNumChild] = useState(0);
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!AuthVerify()) {
+      navigate("/login", { replace: true });
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
