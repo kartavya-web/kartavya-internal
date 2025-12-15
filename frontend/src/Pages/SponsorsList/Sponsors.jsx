@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,13 +15,21 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Loader from "@/components/Loader";
+import AuthVerify from "@/helper/jwtVerify";
 
 
 export default function Sponsors() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(null);
   const [sponsorsData, setSponsorsData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!AuthVerify()) {
+      navigate("/login", { replace: true });
+    }
+  }, []);
 
   useEffect(() => {
     const fetchSponsors = async () => {

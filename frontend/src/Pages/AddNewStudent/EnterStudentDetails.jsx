@@ -46,7 +46,7 @@ const EnterStudentDetails = () => {
 
   useEffect(() => {
     if (!AuthVerify()) {
-      navigate("/login");
+      navigate("/login", { replace: true });
     }
   }, []);
 

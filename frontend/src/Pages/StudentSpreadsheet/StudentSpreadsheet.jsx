@@ -42,7 +42,7 @@ const StudentSpreadsheet = () => {
         const data = await response.json();
 
         if (response.status != 200) {
-          navigate("/login");
+          navigate("/login", { replace: true });
           setStudents(null);
           return;
         }
