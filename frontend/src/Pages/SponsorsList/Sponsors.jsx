@@ -37,7 +37,8 @@ export default function Sponsors() {
         console.log('Fetching sponsors...');
         const res = await axios.get("/api/users/sponsors", {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
         console.log('Response:', res);
