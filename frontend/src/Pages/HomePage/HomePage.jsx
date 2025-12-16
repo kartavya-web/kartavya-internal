@@ -121,10 +121,12 @@ const HomePage = () => {
             max-[767px]:gap-[20vw]
             max-[530px]:gap-20
             max-[430px]:gap-10
-            max-[360px]:flex-col"
+            max-[360px]:flex-col
+            max-[360px]:px-[30vw] max-[360px]:gap-5"
         >
           <Button
             className=" rounded-lg font-bold px-10 py-5 text-[1.1rem]
+              max-[360px]:w-[150px]
               max-[1100px]:px-9 max-[1100px]:py-4 max-[1100px]:text-[1rem]
               max-[900px]:px-8  max-[900px]:py-3 max-[900px]:text-[0.95rem]
               max-[700px]:px-7  max-[700px]:py-3 max-[700px]:text-[0.9rem]
