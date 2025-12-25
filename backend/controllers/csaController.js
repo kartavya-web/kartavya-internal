@@ -11,11 +11,12 @@ const getVerifiedDonations = asyncHandler(async (req, res) => {
   res.json(verifiedDonations);
 });
 
-// @route GET/api/allotment/action
+// @route GET /api/allotment/action
+// @route GET /api/allotment/available
 const getChildTobeAlloted = asyncHandler(async (req, res) => {
   const sponsorid = req.headers["sponsorid"];
 
-  const students = await Student.find({
+  const query = {
     sponsorshipStatus: true,
     $expr: {
       $gt: [
@@ -25,10 +26,21 @@ const getChildTobeAlloted = asyncHandler(async (req, res) => {
         { $multiply: [{ $size: "$sponsorId" }, 8500] },
       ],
     },
-    sponsorId: { $not: { $in: [sponsorid] } },
-  }).lean();
+  };
 
-  res.status(200).json({ success: true, data: students });
+  // ✅ ONLY exclude sponsor-allotted children IF sponsorid exists
+  if (sponsorid) {
+    query.sponsorId = { $not: { $in: [sponsorid] } };
+  }
+
+  const students = await Student.find(query)
+    .select("studentName rollNumber class centre school profilePhoto")
+    .lean();
+
+  res.status(200).json({
+    success: true,
+    data: students,
+  });
 });
 
 const sendAllotmentEmail = async (sponsor, student) => {
