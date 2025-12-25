@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FiLogIn, FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AuthVerify from "@/helper/jwtVerify";
 import { Button } from "@/components/ui/button";
+
 
 const cards = [
   {
@@ -37,17 +38,35 @@ const cards = [
     desc: "Assign sponsors to students",
     path: "/allotment",
   },
-  {
-    icon: "/home.png",
-    title: "Home",
-    desc: "Dashboard Overview",
-    path: "/",
-  },
 ];
 
 const HomePage = () => {
   const navigate = useNavigate();
   const userLoggedIn = AuthVerify();
+  const [availableCount, setAvailableCount] = useState(null);
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/allotment/available`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+        if (!res.ok) {
+          console.error("Failed to fetch available students count");
+          return;
+        }
+        const data = await res.json();
+        setAvailableCount(data.data?.length ?? 0);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCount();
+  }, []);
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
@@ -57,12 +76,9 @@ const HomePage = () => {
   };
 
   const handleCardClick = (card) => {
-    if (card.title === "Home") {
-      document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      navigate(card.path);
-    }
+    navigate(card.path);
   };
+
 
   return (
     <>
@@ -176,6 +192,7 @@ const HomePage = () => {
             src="/Monitoring.png"
             alt="Monitoring"
           />
+
         </motion.div>
       </header>
 
@@ -219,10 +236,27 @@ const HomePage = () => {
                 </p>
               </div>
             ))}
+            
+            {/* Available Students Card */}
+            <div
+              onClick={() => navigate("/available-students")}
+              className="w-full max-w-[320px] flex flex-col items-center justify-start border-[1.5px] border-[#222] rounded-2xl p-8 bg-white cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)]"
+            >
+              <div className="h-28 mb-6 md:w-24 md:h-24 flex items-center justify-center">
+                <div className="text-6xl font-extrabold text-blue-500">
+                  {availableCount === null ? "--" : availableCount}
+                </div>
+              </div>
+              <h3 className="text-[22px] font-bold text-center mb-2">
+                Students Available for Allotment
+              </h3>
+              <p className="text-center text-[16px] text-[#555] leading-relaxed">
+                Click to view details
+              </p>
+            </div>
           </div>
-        </section>
+     </section>
       </main>
-
       <footer
         id="about"
         className="min-h-screen grid grid-cols-[1.1fr_1fr] items-center gap-16 bg-[#fde4be] px-24 py-16 max-[900px]:grid-cols-1 max-[900px]:px-8 max-[900px]:text-center"

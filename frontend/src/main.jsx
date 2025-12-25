@@ -1,10 +1,15 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Route, RouterProvider, createRoutesFromElements } from "react-router";
+import {
+  Route,
+  RouterProvider,
+  createRoutesFromElements,
+} from "react-router";
 import { createBrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
+
 import Sample from "@/components/Form/MultiSelect";
 import Sponsors from "./Pages/SponsorsList/Sponsors";
 import EnterStudentDetails from "./Pages/AddNewStudent/EnterStudentDetails";
@@ -14,28 +19,31 @@ import LoginUser from "./Pages/Login/LoginUser";
 import HomePage from "./Pages/HomePage/HomePage";
 import AllotmentHomePage from "./Pages/SponsorAllotment/AllotmentHomePage";
 import AllotChild from "./Pages/SponsorAllotment/AllotChild";
-import { SponsorProvider } from "./context/SponsorContext";
 import AddDonationsToCSM from "./Pages/SponsorAllotment/AddDonationsToCSM";
+import AvailableStudents from "./Pages/AvailableStudents/AvailableStudents";
+import { SponsorProvider } from "./context/SponsorContext";
 import App from "./App";
-
-
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/">
-      <Route path="/" element={<App />} />
+    <Route path="/" element={<App />}>
       <Route index element={<HomePage />} />
-      <Route path="/login" element={<LoginUser />} />
-      <Route path="/enter-student-details" element={<EnterStudentDetails />} />
-      <Route path="/student-spreadsheet" element={<StudentSpreadsheet />} />
-      <Route path="/allotment" element={<AllotmentHomePage />} />
-      <Route path="/allotment/action" element={<AllotChild />} />
-      <Route path="/allotment/addDonationsToCSM" element={<AddDonationsToCSM />} />
-      <Route path="/hello" element={<Sample />} />
-      <Route path="/sponsors" element={<Sponsors />} />
+
+      <Route path="login" element={<LoginUser />} />
+      <Route path="enter-student-details" element={<EnterStudentDetails />} />
+      <Route path="student-spreadsheet" element={<StudentSpreadsheet />} />
+
+      <Route path="allotment" element={<AllotmentHomePage />} />
+      <Route path="allotment/action" element={<AllotChild />} />
+      <Route path="allotment/addDonationsToCSM" element={<AddDonationsToCSM />} />
+
+      <Route path="available-students" element={<AvailableStudents />} />
+
+      <Route path="sponsors" element={<Sponsors />} />
+      <Route path="hello" element={<Sample />} />
 
       {/* Admin Routes */}
-      <Route path="/admin/:id" element={<StudentProfile />} />
+      <Route path="admin/:id" element={<StudentProfile />} />
     </Route>
   )
 );
