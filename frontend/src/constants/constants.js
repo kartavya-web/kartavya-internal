@@ -111,3 +111,8 @@ export const resultTermSession = [
   "Mid Term 2025-26",
   "End Term 2025-26",
 ];
+
+export const AadharVerifiedStatus = [
+  { label: "Verified", value: true },
+  { label: "Not Verified", value: false },
+];

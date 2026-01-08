@@ -10,6 +10,8 @@ import { Centres } from "@/constants/constants";
 import { SponsorshipStatus } from "@/constants/constants";
 import { ActiveStatus } from "@/constants/constants";
 import { Schools } from "@/constants/constants";
+import { AadharVerifiedStatus } from "@/constants/constants";
+
 
 const StudentSpreadsheet = () => {
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ const StudentSpreadsheet = () => {
       sponsorshipStatus: [],
       activeStatus: [],
       school: [],
+      profileAadharVerified: [],
     };
   });
 
@@ -81,9 +84,15 @@ const StudentSpreadsheet = () => {
 
         if (activeFilterValues.length === 0) continue;
 
-        if (!activeFilterValues.includes(student[filterKey])) {
+        const studentValue =
+          student[filterKey] === undefined || student[filterKey] === null
+            ? false
+            : student[filterKey];
+
+        if (!activeFilterValues.includes(studentValue)) {
           return false;
         }
+
       }
       return true;
     });
@@ -142,6 +151,16 @@ const StudentSpreadsheet = () => {
               selectedOptions={filters.activeStatus}
             />
 
+            <FilterComponent
+              filterLable={"Aadhaar Verified"}
+              filterName="profileAadharVerified"
+              filterOptions={AadharVerifiedStatus}
+              handleFilterChange={handleFilterChange}
+              selectedOptions={filters.profileAadharVerified}
+            />
+
+
+
             {/* 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-5 pt-10">
@@ -151,7 +170,7 @@ const StudentSpreadsheet = () => {
           </form> */}
           </div>
 
-          <div className="filters flex flex-col items-center gap-5 mb-20">
+          <div className="filters flex flex-col items-center gap-5 mb-12">
             <div className="text-3xl font-semibold text-center">
               Add Student
             </div>
