@@ -3,6 +3,7 @@ import InputComponent from "@/components/Form/InputComponent";
 import SelectComponent from "@/components/Form/SelectComponent";
 import { Button } from "@/components/ui/button";
 import { Centres, Gender, Schools } from "@/constants/constants";
+import ComboBoxComponent from "@/components/Form/ComboboxComponent";
 
 const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
   return (
@@ -24,7 +25,7 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
               title={"Name of Student"}
               name={"studentName"}
               type={"text"}
-              value={formData.studentName} 
+              value={formData.studentName}
               placeholder={"Name"}
               handleInputChange={handleInputChange}
             />
@@ -100,8 +101,17 @@ const EnterStudentDetails1 = ({ handleClick, handleInputChange, formData }) => {
               value={formData.centre}
             />
           </div>
-          <div className="w-full xl:w-1/2">
+          {/* <div className="w-full xl:w-1/2">
             <SelectComponent
+              title={"School of Student"}
+              name={"school"}
+              options={Schools}
+              handleInputChange={handleInputChange}
+              value={formData.school}
+            />
+          </div> */}
+          <div className="w-full xl:w-1/2">
+            <ComboBoxComponent
               title={"School of Student"}
               name={"school"}
               options={Schools}

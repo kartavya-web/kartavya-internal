@@ -18,6 +18,7 @@ import TextareaComponent from "@/components/Form/TextareaComponent";
 import { Link } from "react-router-dom";
 import { Centres, Gender, Schools } from "@/constants/constants";
 import Result from "./Result";
+import ComboBoxComponent from "@/components/Form/ComboboxComponent";
 
 const StudentProfile = () => {
   const navigate = useNavigate();
@@ -339,7 +340,7 @@ const StudentProfile = () => {
                 />
               </div>
               <div className="w-full xl:w-1/2">
-                <SelectComponent
+                <ComboBoxComponent
                   title={"School of Student"}
                   name={"school"}
                   options={Schools}

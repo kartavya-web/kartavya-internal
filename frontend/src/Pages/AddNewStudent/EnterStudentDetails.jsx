@@ -184,7 +184,7 @@ const EnterStudentDetails = () => {
                     checked={formData.profileAadharVerified}
                     handleChange={handleInputChange}
                   />
-                  
+
                   <CheckboxComponent
                     title="Aadhar Card"
                     name="aadhar"
