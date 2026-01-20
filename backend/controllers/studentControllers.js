@@ -12,7 +12,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     gender,
     dob,
     school,
-    studentClass,
+    class: studentClass,
     fathersName,
     fathersOccupation,
     mothersName,
@@ -85,7 +85,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     disability,
     singleParent,
     relevantCertificate,
-    profileAadharVerified
+    profileAadharVerified,
   };
 
   const stud = await Student.create(studentObject);
@@ -102,7 +102,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
 const getAllStudents = asyncHandler(async (req, res) => {
   const students = await Student.find()
     .select(
-      "studentName rollNumber class centre activeStatus sponsorshipStatus school profileAadharVerified"
+      "studentName rollNumber class centre activeStatus sponsorshipStatus school profileAadharVerified",
     )
     .lean();
 
@@ -124,7 +124,7 @@ const getStudentByRoll = asyncHandler(async (req, res) => {
 
   const sponsors = await User.find(
     { _id: { $in: student.sponsorId } },
-    { name: 1, email: 1, _id: 1 }
+    { name: 1, email: 1, _id: 1 },
   ).lean();
 
   // attach sponsors' info
@@ -251,7 +251,7 @@ const updateStudent = asyncHandler(async (req, res) => {
         relevantCertificate,
         profileAadharVerified,
         comment,
-      }
+      },
     );
 
     if (!updatedStudent) {
@@ -293,7 +293,7 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     }
 
     const existingIndex = student.result.findIndex(
-      (r) => r.sessionTerm === sessionTerm
+      (r) => r.sessionTerm === sessionTerm,
     );
 
     if (existingIndex !== -1) {
@@ -343,7 +343,7 @@ const deleteResult = asyncHandler(async (req, res) => {
     }
 
     const index = student.result.findIndex(
-      (r) => r.sessionTerm === sessionTerm
+      (r) => r.sessionTerm === sessionTerm,
     );
     if (index === -1) {
       return res

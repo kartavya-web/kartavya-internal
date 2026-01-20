@@ -1,5 +1,3 @@
-import InputComponent from "@/components/Form/InputComponent";
-import SelectComponent from "@/components/Form/SelectComponent";
 import { Checkbox } from "@/components/ui/checkbox";
 import React, { useEffect, useState } from "react";
 // import StudentProgressGraph from "./StudentProgressGraph";
@@ -16,9 +14,8 @@ import Loader from "@/components/Loader";
 import { Input } from "@/components/ui/input";
 import TextareaComponent from "@/components/Form/TextareaComponent";
 import { Link } from "react-router-dom";
-import { Centres, Gender, Schools } from "@/constants/constants";
 import Result from "./Result";
-import ComboBoxComponent from "@/components/Form/ComboboxComponent";
+import StudentGeneralDetails from "@/components/StudentGeneralDetails";
 
 const StudentProfile = () => {
   const navigate = useNavigate();
@@ -50,7 +47,7 @@ const StudentProfile = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
         if (!response.ok) throw new Error("Failed to fetch student data");
         const data = await response.json();
@@ -120,12 +117,15 @@ const StudentProfile = () => {
   // delete student
   const handleDeleteStudent = async () => {
     try {
-      const res = await fetch(`/api/students/delete?rollNumber=${encodeURIComponent(id)}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        `/api/students/delete?rollNumber=${encodeURIComponent(id)}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -160,7 +160,7 @@ const StudentProfile = () => {
       // Refresh student data to reflect changes
       const updatedStudentData = { ...studentData };
       updatedStudentData.sponsors = updatedStudentData.sponsors.filter(
-        (sponsor) => sponsor._id !== sponsorId
+        (sponsor) => sponsor._id !== sponsorId,
       );
       setStudentData(updatedStudentData);
     } catch (e) {
@@ -251,178 +251,10 @@ const StudentProfile = () => {
               </Button>
             )}
           </div>
-          <div className="input-section flex flex-col items-end w-full pt-8 gap-[1.2rem]">
-            {/* Row 1 */}
-            <div className="flex flex-col gap-5 xl:gap-0 xl:flex-row flex-wrap w-full">
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Name of Student"}
-                  name={"studentName"}
-                  type={"text"}
-                  value={studentData?.studentName}
-                  placeholder={"Name"}
-                  handleInputChange={handleInputChange}
-                />
-              </div>
-              <div className="w-full xl:w-1/2">
-                <SelectComponent
-                  title={"Gender"}
-                  name={"gender"}
-                  options={Gender}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.gender}
-                />
-              </div>
-            </div>
-
-            {/* Row 2 */}
-            <div className="flex flex-col gap-5 xl:gap-0 xl:flex-row flex-wrap w-full">
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Date of birth of Student"}
-                  name={"dob"}
-                  type={"date"}
-                  placeholder={"Date of birth"}
-                  handleInputChange={handleInputChange}
-                  value={
-                    studentData?.dob
-                      ? new Date(studentData.dob).toISOString().split("T")[0]
-                      : ""
-                  }
-                />
-              </div>
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Address of Student"}
-                  name={"address"}
-                  type={"text"}
-                  placeholder={"Address"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.address}
-                />
-              </div>
-            </div>
-
-            {/* Row 3 */}
-            <div className="flex flex-col gap-5 xl:gap-0 xl:flex-row flex-wrap w-full">
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Current Session"}
-                  name={"currentSession"}
-                  type={"text"}
-                  placeholder={"Session"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.currentSession}
-                />
-              </div>
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Class of Student"}
-                  name={"class"}
-                  type={"text"}
-                  placeholder={"Class"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.class}
-                />
-              </div>
-            </div>
-
-            {/* Row 4 */}
-
-            <div className="flex flex-col gap-5 xl:gap-0 xl:flex-row flex-wrap w-full">
-              <div className="w-full xl:w-1/2">
-                <SelectComponent
-                  title={"Center of Student"}
-                  name={"centre"}
-                  options={Centres}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.centre}
-                />
-              </div>
-              <div className="w-full xl:w-1/2">
-                <ComboBoxComponent
-                  title={"School of Student"}
-                  name={"school"}
-                  options={Schools}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.school}
-                />
-              </div>
-            </div>
-
-            {/* Row 5 */}
-
-            <div className="flex flex-col gap-5 xl:gap-0 xl:flex-row flex-wrap w-full">
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Father's Name"}
-                  name={"fathersName"}
-                  type={"text"}
-                  placeholder={"Father's Name"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.fathersName}
-                />
-              </div>
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Fathers's Occupation"}
-                  name={"fathersOccupation"}
-                  type={"text"}
-                  placeholder={"Father's Occupation"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.fathersOccupation}
-                />
-              </div>
-            </div>
-
-            {/* Row 6 */}
-            <div className="flex flex-col gap-5 xl:gap-0 xl:flex-row flex-wrap w-full">
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Mother's Name"}
-                  name={"mothersName"}
-                  type={"text"}
-                  placeholder={"Mother's Name"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.mothersName}
-                />
-              </div>
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Mothers's Occupation"}
-                  name={"mothersOccupation"}
-                  type={"text"}
-                  placeholder={"Mother's Occupation"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.mothersOccupation}
-                />
-              </div>
-            </div>
-
-            {/* Row 7 */}
-            <div className="flex flex-col gap-5 xl:gap-0 xl:flex-row flex-wrap w-full">
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Annual Family Income"}
-                  name={"annualIncome"}
-                  type={"number"}
-                  placeholder={"Family Income"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.annualIncome}
-                />
-              </div>
-              <div className="w-full xl:w-1/2">
-                <InputComponent
-                  title={"Contact Number"}
-                  name={"contactNumber"}
-                  type={"text"}
-                  placeholder={"Contact Number"}
-                  handleInputChange={handleInputChange}
-                  value={studentData?.contactNumber}
-                />
-              </div>
-            </div>
-          </div>
+          <StudentGeneralDetails
+            studentData={studentData}
+            handleInputChange={handleInputChange}
+          />
         </div>
 
         {/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}

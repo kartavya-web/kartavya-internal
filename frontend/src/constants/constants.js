@@ -90,10 +90,13 @@ export const Schools = [
   { label: "Kendriya Vidyalaya No.2", value: "Kendriya Vidyalaya No.2" },
   { label: "DY Patil", value: "DY Patil" },
   { label: "DPS Hirak", value: "DPS Hirak" },
-  { label: "Dr. JK Sinha Memorial (ISL)", value: "Dr. JK Sinha Memorial (ISL)" },
+  {
+    label: "Dr. JK Sinha Memorial (ISL)",
+    value: "Dr. JK Sinha Memorial (ISL)",
+  },
   { label: "ISL Jharia", value: "ISL Jharia" },
   { label: "St. Xavier", value: "St. Xavier" },
-  { label: "Middle School Dhaiya", value: "Middle School Dhaiya" }
+  { label: "Middle School Dhaiya", value: "Middle School Dhaiya" },
 ];
 
 export const ActiveStatus = [
@@ -102,17 +105,129 @@ export const ActiveStatus = [
 ];
 
 export const Gender = [
-  { label: 'Male', value: 'Male'},
-  { label: 'Female', value: 'Female'},
-  { label: 'Other', value: 'Other'},
+  { label: "Male", value: "Male" },
+  { label: "Female", value: "Female" },
+  { label: "Other", value: "Other" },
 ];
 
-export const resultTermSession = [
-  "Mid Term 2025-26",
-  "End Term 2025-26",
-];
+export const resultTermSession = ["Mid Term 2025-26", "End Term 2025-26"];
 
 export const AadharVerifiedStatus = [
   { label: "Verified", value: true },
   { label: "Not Verified", value: false },
+];
+
+export const FormRows = [
+  [
+    {
+      name: "studentName",
+      componentType: "Input",
+      type: "text",
+      title: "Name of Student",
+      placeholder: "Name",
+    },
+    {
+      name: "gender",
+      componentType: "Select",
+      title: "Gender",
+      placeholder: "Select Gender",
+      options: Gender,
+    },
+  ],
+  [
+    {
+      name: "dob",
+      componentType: "Input",
+      type: "date",
+      title: "Date of birth of Student",
+      placeholder: "Date of Birth",
+    },
+    {
+      name: "address",
+      componentType: "Input",
+      type: "text",
+      title: "Address of Student",
+      placeholder: "Address",
+    },
+  ],
+  [
+    {
+      name: "currentSession",
+      componentType: "Input",
+      type: "text",
+      title: "Current Session",
+      placeholder: "Session",
+    },
+    {
+      name: "class",
+      componentType: "Input",
+      type: "text",
+      title: "Class of Student",
+      placeholder: "Class",
+    },
+  ],
+  [
+    {
+      name: "centre",
+      componentType: "Select",
+      title: "Centre",
+      placeholder: "Select Centre",
+      options: Centres,
+    },
+    {
+      name: "school",
+      componentType: "ComboBox",
+      title: "School of School",
+      placeholder: "Select or Type School",
+      options: Schools,
+    },
+  ],
+  [
+    {
+      name: "fathersName",
+      componentType: "Input",
+      type: "text",
+      title: "Father's Name",
+      placeholder: "Father's Name",
+    },
+    {
+      name: "fathersOccupation",
+      componentType: "Input",
+      type: "text",
+      title: "Father's Occupation",
+      placeholder: "Father's Occupation",
+    },
+  ],
+  [
+    {
+      name: "mothersName",
+      componentType: "Input",
+      type: "text",
+      title: "Mother's Name",
+      placeholder: "Mother's Name",
+    },
+    {
+      name: "mothersOccupation",
+      componentType: "Input",
+      type: "text",
+      title: "Mother's Occupation",
+      placeholder: "Mother's Occupation",
+    },
+  ],
+  [
+    {
+      name: "annualIncome",
+      componentType: "Input",
+      type: "number",
+      title: "Annual Family Income",
+      placeholder: "Family Income",
+    },
+    {
+      name: "contactNumber",
+      componentType: "Input",
+      type: "text",
+      title: "Contact Number",
+      placeholder: "Contact Number",
+    },
+  ],
 ];
