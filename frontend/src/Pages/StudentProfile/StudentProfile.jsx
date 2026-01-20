@@ -43,7 +43,7 @@ const StudentProfile = () => {
     const fetchStudentData = async () => {
       try {
         const response = await fetch(
-          `/api/students/${encodeURIComponent(id)}`,
+          `/api/students/by-roll?rollNumber=${encodeURIComponent(id)}`,
           {
             method: "GET",
             credentials: "include",
@@ -92,8 +92,8 @@ const StudentProfile = () => {
         console.log(key, value);
       }
 
-      const res = await fetch(`/api/students/${encodeURIComponent(id)}`, {
-        method: "PUT",
+      const res = await fetch(`/api/students/update`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -120,7 +120,7 @@ const StudentProfile = () => {
   // delete student
   const handleDeleteStudent = async () => {
     try {
-      const res = await fetch(`/api/students/${encodeURIComponent(id)}`, {
+      const res = await fetch(`/api/students/delete?rollNumber=${encodeURIComponent(id)}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

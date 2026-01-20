@@ -5,7 +5,7 @@ const asyncHandler = require("express-async-handler");
 const { get } = require("https");
 const { get: httpGet } = require("http");
 
-// @route POST/Students
+// @route POST /Students
 const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
   const {
     studentName,
@@ -98,7 +98,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
   }
 });
 
-// @route GET/Students
+// @route GET /Students
 const getAllStudents = asyncHandler(async (req, res) => {
   const students = await Student.find()
     .select(
@@ -109,9 +109,9 @@ const getAllStudents = asyncHandler(async (req, res) => {
   res.json(students);
 });
 
-// @route GET/Students/:rollNumber
+// @route GET /students/by-roll?rollNumber=ROLL_NUMBER
 const getStudentByRoll = asyncHandler(async (req, res) => {
-  const rollNumber = req.params.rollNumber;
+  const { rollNumber } = req.query;
   const student = await Student.findOne({ rollNumber })
     .populate("sponsorId", "name email batch")
     .exec();
@@ -136,7 +136,7 @@ const getStudentByRoll = asyncHandler(async (req, res) => {
   res.json(studentData);
 });
 
-// @route PATCH/Students
+// @route PATCH /Students
 const updateStudent = asyncHandler(async (req, res) => {
   const {
     rollNumber,
@@ -266,10 +266,9 @@ const updateStudent = asyncHandler(async (req, res) => {
   }
 });
 
-// @route PUT/Students
+// @route PATCH /Students/result
 const updateResult = asyncHandler(async (req, res, resultUrl) => {
-  const rollNumber = req.params.rollNumber;
-  const { sessionTerm } = req.body;
+  const { sessionTerm, rollNumber } = req.body;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
@@ -321,9 +320,9 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
   }
 });
 
+// @route DELETE /Students/result
 const deleteResult = asyncHandler(async (req, res) => {
-  const rollNumber = req.params.rollNumber;
-  const { sessionTerm } = req.body;
+  const { sessionTerm, rollNumber } = req.body;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
@@ -372,9 +371,9 @@ const deleteResult = asyncHandler(async (req, res) => {
   }
 });
 
-// @route PATCH/Students/:rollNumber
+// @route PATCH /Students/profile-picture?rollNumber=ROLL_NUMBER
 const updateProfilePhoto = asyncHandler(async (req, res, profileUrl) => {
-  const rollNumber = req.params.rollNumber;
+  const { rollNumber } = req.query;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
@@ -412,9 +411,9 @@ const updateProfilePhoto = asyncHandler(async (req, res, profileUrl) => {
   }
 });
 
-// @route DELETE/Students/:rollNumber
+// @route DELETE /Students/delete?rollNumber=ROLL_NUMBER
 const deleteStudent = asyncHandler(async (req, res) => {
-  const rollNumber = req.params.rollNumber;
+  const { rollNumber } = req.query;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });

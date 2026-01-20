@@ -11,14 +11,14 @@ const Result = ({ studentData }) => {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `/api/students/${encodeURIComponent(studentData.rollNumber)}/deleteResult`,
+        `/api/students/result`,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ sessionTerm }),
+          body: JSON.stringify({ sessionTerm, rollNumber: studentData.rollNumber }),
         }
       );
 

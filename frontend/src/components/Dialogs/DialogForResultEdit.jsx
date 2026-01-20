@@ -10,7 +10,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { toast } from "react-toastify";
 import { useParams } from "react-router";
@@ -43,18 +49,16 @@ const DialogForResultEdit = ({ studentData }) => {
     formData.append("result", resultFile, resultFile.name);
     formData.append("pictureType", "resultPhoto");
     formData.append("sessionTerm", sessionTerm);
+    formData.append("rollNumber", id);
 
     try {
-      const res = await fetch(
-        `/api/students/${encodeURIComponent(id)}/uploadResult`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const res = await fetch(`/api/students/result`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -78,9 +82,7 @@ const DialogForResultEdit = ({ studentData }) => {
       <DialogTrigger asChild>
         <Button>
           <Pencil1Icon />
-          <span className="ml-2">
-            Add / Edit Result
-          </span>
+          <span className="ml-2">Add / Edit Result</span>
         </Button>
       </DialogTrigger>
 
@@ -90,7 +92,8 @@ const DialogForResultEdit = ({ studentData }) => {
             {studentData?.result?.length ? "Edit Result" : "Add Result"}
           </DialogTitle>
           <DialogDescription>
-            Select the session term and upload the result file. Click upload when done.
+            Select the session term and upload the result file. Click upload
+            when done.
           </DialogDescription>
         </DialogHeader>
 
@@ -114,7 +117,9 @@ const DialogForResultEdit = ({ studentData }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Result File</label>
+            <label className="block text-sm font-medium mb-1">
+              Result File
+            </label>
             <Input
               type="file"
               onChange={handleFileChange}

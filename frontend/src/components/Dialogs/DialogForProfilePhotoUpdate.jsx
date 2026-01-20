@@ -35,7 +35,7 @@ const DialogForProfilePhotoUpdate = ({ photoExists }) => {
       }
 
       const res = await fetch(
-        `/api/students/${encodeURIComponent(id)}/updateProfilePhoto`,
+        `/api/students/profile-picture?rollNumber=${encodeURIComponent(id)}`,
         {
           method: "PATCH",
           body: dataToSend,

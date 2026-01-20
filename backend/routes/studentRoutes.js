@@ -9,15 +9,15 @@ const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
 
 const sanitizeFilename = (originalname) => {
-  const ext = path.extname(originalname).toLowerCase(); // Get file extension
-  const timestamp = Date.now(); // Current time in milliseconds
-  const uniqueId = crypto.randomBytes(8).toString("hex"); // Generate a safe, random 16-character string
+  const ext = path.extname(originalname).toLowerCase();
+  const timestamp = Date.now();
+  const uniqueId = crypto.randomBytes(8).toString("hex");
   return `profile_photo_${timestamp}_${uniqueId}${ext}`;
 };
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     file.originalname = sanitizeFilename(file.originalname);
     cb(null, true);
@@ -38,30 +38,29 @@ router
 
 router.get("/get-base64-image", studentController.getBase64Image);
 
-router
-  .route("/:rollNumber")
-  .get(studentController.getStudentByRoll)
-  .put(studentController.updateStudent)
-  .delete(studentController.deleteStudent);
 
-router.route(`/:rollNumber/uploadResult`).patch(
-  upload.single("result"), // Handle file upload
+router.get("/by-roll", studentController.getStudentByRoll);
+router.patch("/update", studentController.updateStudent);
+router.delete("/delete", studentController.deleteStudent);
+
+router.patch(
+  "/profile-picture",
+  upload.single("profilePicture"),
   asyncHandler(azure.uploadToAzureBlob),
   asyncHandler(async (req, res) => {
-    const resultUrl = req.fileUrl ? req.fileUrl : "";
-    await studentController.updateResult(req, res, resultUrl);
+    const profileUrl = req.fileUrl || "";
+    await studentController.updateProfilePhoto(req, res, profileUrl);
   })
 );
 
-router.route(`/:rollNumber/deleteResult`)
-  .delete(studentController.deleteResult)
-
-router.route(`/:rollNumber/updateProfilePhoto`).patch(
-  upload.single("profilePicture"), // Handle file upload
+router.delete("/result", studentController.deleteResult);
+router.patch(
+  "/result",
+  upload.single("result"),
   asyncHandler(azure.uploadToAzureBlob),
   asyncHandler(async (req, res) => {
-    const profileUrl = req.fileUrl ? req.fileUrl : "";
-    await studentController.updateProfilePhoto(req, res, profileUrl);
+    const resultUrl = req.fileUrl || "";
+    await studentController.updateResult(req, res, resultUrl);
   })
 );
 
