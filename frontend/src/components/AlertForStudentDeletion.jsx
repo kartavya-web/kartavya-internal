@@ -27,7 +27,9 @@ export function AlertForDialogDeletion({ handleClick, text }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => handleClick()}>Delete</AlertDialogAction>
+          <AlertDialogAction onClick={() => handleClick()}>
+            Delete
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

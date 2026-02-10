@@ -110,7 +110,7 @@ export const Gender = [
   { label: "Other", value: "Other" },
 ];
 
-export const resultTermSession = ["Mid Term 2025-26", "End Term 2025-26"];
+export const resultSession = ["2025-26", "2026-27"];
 
 export const AadharVerifiedStatus = [
   { label: "Verified", value: true },
@@ -230,4 +230,36 @@ export const FormRows = [
       placeholder: "Contact Number",
     },
   ],
+];
+
+export const DOCUMENT_CHECKBOXES = [
+  {
+    title: "Profile Aadhar Verified",
+    name: "profileAadharVerified",
+  },
+  {
+    title: "Aadhar Card",
+    name: "aadhar",
+  },
+  {
+    title: "Domicile Certificate",
+    name: "domicile",
+  },
+  {
+    title: "Birth Certificate",
+    name: "birthCertificate",
+  },
+  {
+    title: "Disability Certificate",
+    name: "disability",
+  },
+  {
+    title: "Single Parent",
+    name: "singleParent",
+  },
+  {
+    title: "Do you have relevantCertificate Certificate ?",
+    name: "relevantCertificate",
+    indent: true,
+  },
 ];

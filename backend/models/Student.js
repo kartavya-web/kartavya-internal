@@ -23,7 +23,7 @@ const studentSchema = new mongoose.Schema({
   },
   result: [
     {
-      sessionTerm: String,
+      session: String,
       url: String
     }
   ],

@@ -7,28 +7,28 @@ const Result = ({ studentData }) => {
   const [results, setResults] = useState(studentData?.result || []);
   const isPDF = (url) => url?.toLowerCase().endsWith(".pdf");
 
-  const handleDelete = async (sessionTerm) => {
+  const handleDelete = async (session) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(
-        `/api/students/result`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ sessionTerm, rollNumber: studentData.rollNumber }),
-        }
-      );
+      const res = await fetch(`/api/students/result`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          session,
+          rollNumber: studentData.rollNumber,
+        }),
+      });
 
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to delete result");
       }
 
-      toast.success(`Result for "${sessionTerm}" deleted successfully`);
-      setResults(results.filter((r) => r.sessionTerm !== sessionTerm));
+      toast.success(`Result for "${session}" deleted successfully`);
+      setResults(results.filter((r) => r.session !== session));
     } catch (error) {
       toast.error(`Error deleting result: ${error.message}`);
     }
@@ -48,10 +48,12 @@ const Result = ({ studentData }) => {
               key={index}
               className="result flex flex-col items-start gap-3 rounded-lg border p-4"
             >
-
               <div className="flex justify-between w-full items-center">
-                <h3 className="text-lg font-semibold">{res.sessionTerm}</h3>
-                <AlertForDialogDeletion handleClick={() => handleDelete(res.sessionTerm)} text={" result "}/>
+                <h3 className="text-lg font-semibold">{res.session}</h3>
+                <AlertForDialogDeletion
+                  handleClick={() => handleDelete(res.session)}
+                  text={" result "}
+                />
               </div>
 
               {res.url ? (
@@ -66,7 +68,7 @@ const Result = ({ studentData }) => {
                 ) : (
                   <img
                     src={res.url}
-                    alt={res.sessionTerm}
+                    alt={res.session}
                     className="w-full rounded-md border"
                   />
                 )

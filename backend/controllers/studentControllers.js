@@ -268,7 +268,7 @@ const updateStudent = asyncHandler(async (req, res) => {
 
 // @route PATCH /Students/result
 const updateResult = asyncHandler(async (req, res, resultUrl) => {
-  const { sessionTerm, rollNumber } = req.body;
+  const { session, rollNumber } = req.body;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
@@ -278,8 +278,8 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     return res.status(400).json({ message: "Result not uploaded properly" });
   }
 
-  if (!sessionTerm) {
-    return res.status(400).json({ message: "Session term is required" });
+  if (!session) {
+    return res.status(400).json({ message: "Session is required" });
   }
 
   try {
@@ -293,7 +293,7 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     }
 
     const existingIndex = student.result.findIndex(
-      (r) => r.sessionTerm === sessionTerm,
+      (r) => r.session === session,
     );
 
     if (existingIndex !== -1) {
@@ -303,13 +303,13 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
       }
       student.result[existingIndex].url = resultUrl;
     } else {
-      student.result.push({ sessionTerm: sessionTerm, url: resultUrl });
+      student.result.push({ session, url: resultUrl });
     }
 
     await student.save();
 
     res.status(200).json({
-      message: `Result for "${sessionTerm}" of ${student.studentName} updated successfully.`,
+      message: `Result for "${session}" of ${student.studentName} updated successfully.`,
     });
   } catch (error) {
     console.error("Error updating student result:", error);
@@ -322,14 +322,14 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
 
 // @route DELETE /Students/result
 const deleteResult = asyncHandler(async (req, res) => {
-  const { sessionTerm, rollNumber } = req.body;
+  const { session, rollNumber } = req.body;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
   }
 
-  if (!sessionTerm) {
-    return res.status(400).json({ message: "Session term required" });
+  if (!session) {
+    return res.status(400).json({ message: "Session required" });
   }
 
   try {
@@ -342,13 +342,11 @@ const deleteResult = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "No results to delete" });
     }
 
-    const index = student.result.findIndex(
-      (r) => r.sessionTerm === sessionTerm,
-    );
+    const index = student.result.findIndex((r) => r.session === session);
     if (index === -1) {
       return res
         .status(404)
-        .json({ message: "Result for this session term not found" });
+        .json({ message: "Result for this session not found" });
     }
 
     const oldURL = student.result[index].url;
@@ -360,7 +358,7 @@ const deleteResult = asyncHandler(async (req, res) => {
     await student.save();
 
     res.status(200).json({
-      message: `Result for "${sessionTerm}" of ${student.studentName} deleted successfully.`,
+      message: `Result for "${session}" of ${student.studentName} deleted successfully.`,
     });
   } catch (error) {
     console.error("Error deleting student result:", error);

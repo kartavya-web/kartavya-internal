@@ -7,6 +7,7 @@ import AuthVerify from "@/helper/jwtVerify";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import StudentGeneralDetails from "@/components/StudentGeneralDetails";
+import { DOCUMENT_CHECKBOXES } from "@/constants/constants";
 
 const EnterStudentDetails = () => {
   const [isFirstPage, setIsFirstPage] = useState(true);
@@ -194,56 +195,16 @@ const EnterStudentDetails = () => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                  <CheckboxComponent
-                    title="Profile Aadhar Verified"
-                    name="profileAadharVerified"
-                    checked={formData.profileAadharVerified}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Aadhar Card"
-                    name="aadhar"
-                    checked={formData.aadhar}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Domicile Certificate"
-                    name="domicile"
-                    checked={formData.domicile}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Birth Certificate"
-                    name="birthCertificate"
-                    checked={formData.birthCertificate}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Disability Certificate"
-                    name="disability"
-                    checked={formData.disability}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Single Parent"
-                    name="singleParent"
-                    checked={formData.singleParent}
-                    handleChange={handleInputChange}
-                  />
-
-                  <div className="ml-10">
-                    <CheckboxComponent
-                      title="Do you have relevantCertificate Certificate ?"
-                      name="relevantCertificate"
-                      checked={formData.relevantCertificate}
-                      handleChange={handleInputChange}
-                    />
-                  </div>
+                  {DOCUMENT_CHECKBOXES.map(({ title, name, indent }) => (
+                    <div key={name} className={indent ? "ml-10" : ""}>
+                      <CheckboxComponent
+                        title={title}
+                        name={name}
+                        checked={Boolean(formData?.[name])}
+                        handleChange={handleInputChange}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 
