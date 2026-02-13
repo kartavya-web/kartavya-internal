@@ -10,6 +10,7 @@ import DialogForPdfPreview from "../../components/Dialogs/DialogForPdfPreview";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import { AlertForDialogDeletion } from "@/components/AlertForStudentDeletion";
+import { AlertForDeallotment } from "@/components/AlertForDeallotment";
 import DialogForProfilePhotoUpdate from "../../components/Dialogs/DialogForProfilePhotoUpdate";
 import AuthVerify from "@/helper/jwtVerify";
 import Loader from "@/components/Loader";
@@ -618,6 +619,10 @@ const StudentProfile = () => {
                           </p>
                         )}
                       </div>
+                      <AlertForDeallotment
+                        sponsorName={sponsor.name}
+                        handleClick={() => handleDeAllotment(sponsor._id)}
+                      />
                     </div>
                   ))}
                 </div>
