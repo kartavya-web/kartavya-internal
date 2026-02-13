@@ -1,40 +1,70 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 const Students = require("./models/Student");
 
-const runMigration = async () => {
+const runTestMigration = async () => {
+  try {
+    await mongoose.connect(process.env.DATABASE_URI);
+    console.log("Connected to DB");
 
-  const dbUri = process.env.MONGO_URI;
-  await mongoose.connect(dbUri);
+    const updatedDoc = await Students.findOneAndUpdate(
+      { "result.sessionTerm": { $exists: true } },
+      [
+        {
+          $set: {
+            result: {
+              $map: {
+                input: "$result",
+                as: "res",
+                in: {
+                  $mergeObjects: [
+                    "$$res",
+                    {
+                      session: {
+                        $arrayElemAt: [
+                          { $split: ["$$res.sessionTerm", " "] },
+                          -1,
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+        {
+          $set: {
+            result: {
+              $map: {
+                input: "$result",
+                as: "res",
+                in: {
+                  $arrayToObject: {
+                    $filter: {
+                      input: { $objectToArray: "$$res" },
+                      as: "field",
+                      cond: { $ne: ["$$field.k", "sessionTerm"] },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+      { new: true }, // returns updated document
+    );
 
-  console.log("connected to the database..");
-  const result = await Students.updateMany(
-    {
-      result: {
-        $exists: true,
-        $not: { $size: 0 },
-        $elemMatch: { $type: "string" }
-      }
-    },
-    [
-      {
-        $set: {
-          result: {
-            $map: {
-              input: "$result",
-              as: "r",
-              in: { sessionTerm: "$$r", url: "" } // 🔹 convert string → object
-            }
-          }
-        }
-      }
-    ]
-  );
-
-  console.log("Migration complete!");
-  await mongoose.disconnect();
+    console.log("Updated Document:\n", JSON.stringify(updatedDoc, null, 2));
+    process.exit(0);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
 };
-runMigration().catch(console.error);
 
+runTestMigration();
 
 const { BlobServiceClient } = require("@azure/storage-blob");
 require("dotenv").config();
@@ -48,7 +78,7 @@ const deleteFromAzureBlob = async (blobUrl) => {
     }
 
     const blobServiceClient = BlobServiceClient.fromConnectionString(
-      AZURE_CONNECTION_STRING
+      AZURE_CONNECTION_STRING,
     );
     const containerClient =
       blobServiceClient.getContainerClient(AZURE_CONTAINER_NAME);

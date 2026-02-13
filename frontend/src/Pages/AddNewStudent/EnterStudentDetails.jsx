@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import HeaderForInputStudentDetails from "@/components/HeaderForInputStudentDetails";
-import EnterStudentDetails1 from "./EnterStudentDetails1";
 import { toast } from "react-toastify";
 import CheckboxComponent from "@/components/Form/CheckboxComponent";
 import { Input } from "@/components/ui/input";
 import AuthVerify from "@/helper/jwtVerify";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
+import StudentGeneralDetails from "@/components/StudentGeneralDetails";
+import { DOCUMENT_CHECKBOXES } from "@/constants/constants";
 
 const EnterStudentDetails = () => {
   const [isFirstPage, setIsFirstPage] = useState(true);
@@ -22,9 +23,8 @@ const EnterStudentDetails = () => {
     rollNumber: "",
     gender: "",
     currentSession: "2025-26",
-    reportCard: "",
     dob: "",
-    studentClass: "",
+    class: "",
     school: "",
     centre: "",
     contactNumber: "",
@@ -77,7 +77,7 @@ const EnterStudentDetails = () => {
         formDataToSend.append(
           "profilePicture",
           profilePicture,
-          profilePicture?.name
+          profilePicture?.name,
         );
         formDataToSend.append("pictureType", "profilePhoto");
       }
@@ -125,25 +125,42 @@ const EnterStudentDetails = () => {
         </div>
 
         <div className="relative w-full overflow-hidden xl:w-3/5 xl:h-full">
-          {/* Animation Class */}
           <div
             className={`transition-transform duration-500 ease-in-out absolute inset-0 overflow-hidden ${
               isFirstPage ? "translate-x-0" : "-translate-x-full"
             }`}
           >
-            {/* Student Details Page 1 */}
-            <EnterStudentDetails1
-              handleClick={handleClick}
-              handleInputChange={handleInputChange}
-              formData={formData}
-            />
+            <div className="flex flex-col items-center w-full h-full pt-5 overflow-y-scroll">
+              <div className="progress1 flex justify-center items-center w-full h-7">
+                <img
+                  src="/progress1.png"
+                  alt="first-step"
+                  className="object-contain h-full"
+                />
+              </div>
+
+              <StudentGeneralDetails
+                studentData={formData}
+                handleInputChange={handleInputChange}
+              />
+
+              <div className="flex items-center w-full my-10">
+                <div className="flex justify-center w-[90%] pl-[6%] pr-[2.5%]">
+                  <Button
+                    onClick={handleClick}
+                    className="w-[150px] p-2 rounded-lg"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
           <div
             className={`transition-transform duration-500 ease-in-out absolute inset-0 overflow-hidden ${
               isFirstPage ? "translate-x-full" : "translate-x-0"
             }`}
           >
-            {/* Student Details Page 2 */}
             <div className="flex flex-col items-center w-full h-full pt-5 overflow-y-scroll">
               <div className="progress1 flex justify-center items-center w-full h-7">
                 <img
@@ -178,56 +195,16 @@ const EnterStudentDetails = () => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                  <CheckboxComponent
-                    title="Profile Aadhar Verified"
-                    name="profileAadharVerified"
-                    checked={formData.profileAadharVerified}
-                    handleChange={handleInputChange}
-                  />
-                  
-                  <CheckboxComponent
-                    title="Aadhar Card"
-                    name="aadhar"
-                    checked={formData.aadhar}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Domicile Certificate"
-                    name="domicile"
-                    checked={formData.domicile}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Birth Certificate"
-                    name="birthCertificate"
-                    checked={formData.birthCertificate}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Disability Certificate"
-                    name="disability"
-                    checked={formData.disability}
-                    handleChange={handleInputChange}
-                  />
-
-                  <CheckboxComponent
-                    title="Single Parent"
-                    name="singleParent"
-                    checked={formData.singleParent}
-                    handleChange={handleInputChange}
-                  />
-
-                  <div className="ml-10">
-                    <CheckboxComponent
-                      title="Do you have relevantCertificate Certificate ?"
-                      name="relevantCertificate"
-                      checked={formData.relevantCertificate}
-                      handleChange={handleInputChange}
-                    />
-                  </div>
+                  {DOCUMENT_CHECKBOXES.map(({ title, name, indent }) => (
+                    <div key={name} className={indent ? "ml-10" : ""}>
+                      <CheckboxComponent
+                        title={title}
+                        name={name}
+                        checked={Boolean(formData?.[name])}
+                        handleChange={handleInputChange}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 

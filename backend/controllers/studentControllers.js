@@ -5,14 +5,14 @@ const asyncHandler = require("express-async-handler");
 const { get } = require("https");
 const { get: httpGet } = require("http");
 
-// @route POST/Students
+// @route POST /Students
 const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
   const {
     studentName,
     gender,
     dob,
     school,
-    studentClass,
+    class: studentClass,
     fathersName,
     fathersOccupation,
     mothersName,
@@ -85,7 +85,7 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
     disability,
     singleParent,
     relevantCertificate,
-    profileAadharVerified
+    profileAadharVerified,
   };
 
   const stud = await Student.create(studentObject);
@@ -98,20 +98,20 @@ const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
   }
 });
 
-// @route GET/Students
+// @route GET /Students
 const getAllStudents = asyncHandler(async (req, res) => {
   const students = await Student.find()
     .select(
-      "studentName rollNumber class centre activeStatus sponsorshipStatus school profileAadharVerified"
+      "studentName rollNumber class centre activeStatus sponsorshipStatus school profileAadharVerified",
     )
     .lean();
 
   res.json(students);
 });
 
-// @route GET/Students/:rollNumber
+// @route GET /students/by-roll?rollNumber=ROLL_NUMBER
 const getStudentByRoll = asyncHandler(async (req, res) => {
-  const rollNumber = req.params.rollNumber;
+  const { rollNumber } = req.query;
   const student = await Student.findOne({ rollNumber })
     .populate("sponsorId", "name email batch")
     .exec();
@@ -124,7 +124,7 @@ const getStudentByRoll = asyncHandler(async (req, res) => {
 
   const sponsors = await User.find(
     { _id: { $in: student.sponsorId } },
-    { name: 1, email: 1, _id: 1 }
+    { name: 1, email: 1, _id: 1 },
   ).lean();
 
   // attach sponsors' info
@@ -136,7 +136,7 @@ const getStudentByRoll = asyncHandler(async (req, res) => {
   res.json(studentData);
 });
 
-// @route PATCH/Students
+// @route PATCH /Students
 const updateStudent = asyncHandler(async (req, res) => {
   const {
     rollNumber,
@@ -251,7 +251,7 @@ const updateStudent = asyncHandler(async (req, res) => {
         relevantCertificate,
         profileAadharVerified,
         comment,
-      }
+      },
     );
 
     if (!updatedStudent) {
@@ -266,10 +266,9 @@ const updateStudent = asyncHandler(async (req, res) => {
   }
 });
 
-// @route PUT/Students
+// @route PATCH /Students/result
 const updateResult = asyncHandler(async (req, res, resultUrl) => {
-  const rollNumber = req.params.rollNumber;
-  const { sessionTerm } = req.body;
+  const { session, rollNumber } = req.body;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
@@ -279,8 +278,8 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     return res.status(400).json({ message: "Result not uploaded properly" });
   }
 
-  if (!sessionTerm) {
-    return res.status(400).json({ message: "Session term is required" });
+  if (!session) {
+    return res.status(400).json({ message: "Session is required" });
   }
 
   try {
@@ -294,7 +293,7 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     }
 
     const existingIndex = student.result.findIndex(
-      (r) => r.sessionTerm === sessionTerm
+      (r) => r.session === session,
     );
 
     if (existingIndex !== -1) {
@@ -304,13 +303,13 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
       }
       student.result[existingIndex].url = resultUrl;
     } else {
-      student.result.push({ sessionTerm: sessionTerm, url: resultUrl });
+      student.result.push({ session, url: resultUrl });
     }
 
     await student.save();
 
     res.status(200).json({
-      message: `Result for "${sessionTerm}" of ${student.studentName} updated successfully.`,
+      message: `Result for "${session}" of ${student.studentName} updated successfully.`,
     });
   } catch (error) {
     console.error("Error updating student result:", error);
@@ -321,16 +320,16 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
   }
 });
 
+// @route DELETE /Students/result
 const deleteResult = asyncHandler(async (req, res) => {
-  const rollNumber = req.params.rollNumber;
-  const { sessionTerm } = req.body;
+  const { session, rollNumber } = req.body;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
   }
 
-  if (!sessionTerm) {
-    return res.status(400).json({ message: "Session term required" });
+  if (!session) {
+    return res.status(400).json({ message: "Session required" });
   }
 
   try {
@@ -343,13 +342,11 @@ const deleteResult = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "No results to delete" });
     }
 
-    const index = student.result.findIndex(
-      (r) => r.sessionTerm === sessionTerm
-    );
+    const index = student.result.findIndex((r) => r.session === session);
     if (index === -1) {
       return res
         .status(404)
-        .json({ message: "Result for this session term not found" });
+        .json({ message: "Result for this session not found" });
     }
 
     const oldURL = student.result[index].url;
@@ -361,7 +358,7 @@ const deleteResult = asyncHandler(async (req, res) => {
     await student.save();
 
     res.status(200).json({
-      message: `Result for "${sessionTerm}" of ${student.studentName} deleted successfully.`,
+      message: `Result for "${session}" of ${student.studentName} deleted successfully.`,
     });
   } catch (error) {
     console.error("Error deleting student result:", error);
@@ -372,9 +369,9 @@ const deleteResult = asyncHandler(async (req, res) => {
   }
 });
 
-// @route PATCH/Students/:rollNumber
+// @route PATCH /Students/profile-picture?rollNumber=ROLL_NUMBER
 const updateProfilePhoto = asyncHandler(async (req, res, profileUrl) => {
-  const rollNumber = req.params.rollNumber;
+  const { rollNumber } = req.query;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
@@ -412,9 +409,9 @@ const updateProfilePhoto = asyncHandler(async (req, res, profileUrl) => {
   }
 });
 
-// @route DELETE/Students/:rollNumber
+// @route DELETE /Students/delete?rollNumber=ROLL_NUMBER
 const deleteStudent = asyncHandler(async (req, res) => {
-  const rollNumber = req.params.rollNumber;
+  const { rollNumber } = req.query;
 
   if (!rollNumber) {
     return res.status(400).json({ message: "Roll Number required" });
