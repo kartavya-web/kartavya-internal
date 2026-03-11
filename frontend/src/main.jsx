@@ -21,6 +21,7 @@ import AllotmentHomePage from "./Pages/SponsorAllotment/AllotmentHomePage";
 import AllotChild from "./Pages/SponsorAllotment/AllotChild";
 import AddDonationsToCSM from "./Pages/SponsorAllotment/AddDonationsToCSM";
 import AvailableStudents from "./Pages/AvailableStudents/AvailableStudents";
+import DonationPipeline from "./Pages/DonationPipeline/DonationPipeline";
 import { SponsorProvider } from "./context/SponsorContext";
 import App from "./App";
 
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
       <Route path="allotment" element={<AllotmentHomePage />} />
       <Route path="allotment/action" element={<AllotChild />} />
       <Route path="allotment/addDonationsToCSM" element={<AddDonationsToCSM />} />
+      <Route path="allotment/pipeline" element={<DonationPipeline />} />
 
       <Route path="available-students" element={<AvailableStudents />} />
 

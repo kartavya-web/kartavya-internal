@@ -1,7 +1,7 @@
 // frontend/src/Pages/SponsorsList/Sponsors.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Search, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, RotateCw } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ export default function Sponsors() {
   const [expanded, setExpanded] = useState(null);
   const [sponsorsData, setSponsorsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     if (!AuthVerify()) {
@@ -31,32 +32,42 @@ export default function Sponsors() {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchSponsors = async () => {
-      try {
-        console.log('Fetching sponsors...');
-        const res = await axios.get("/api/users/sponsors", {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        console.log('Response:', res);
-        console.log('Sponsors data received:', res.data);
-        if (Array.isArray(res.data)) {
-          setSponsorsData(res.data);
-        } else {
-          console.error('Received non-array data:', res.data);
-          setSponsorsData([]);
+  const fetchSponsors = async () => {
+    try {
+      console.log('Fetching sponsors...');
+      const res = await axios.get("/api/users/sponsors", {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
-      } catch (err) {
-        console.error("Error fetching sponsors:", err.response?.data || err.message);
-      } finally {
-        setLoading(false);
+      });
+      console.log('Response:', res);
+      console.log('Sponsors data received:', res.data);
+      if (Array.isArray(res.data)) {
+        setSponsorsData(res.data);
+      } else {
+        console.error('Received non-array data:', res.data);
+        setSponsorsData([]);
       }
+    } catch (err) {
+      console.error("Error fetching sponsors:", err.response?.data || err.message);
+    }
+  };
+
+  useEffect(() => {
+    const loadSponsors = async () => {
+      setLoading(true);
+      await fetchSponsors();
+      setLoading(false);
     };
-    fetchSponsors();
+    loadSponsors();
   }, []);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchSponsors();
+    setIsRefreshing(false);
+  };
 
   const filteredSponsors = sponsorsData
     .filter((sponsor) => {
@@ -79,7 +90,7 @@ export default function Sponsors() {
       {/* Navbar removed as requested; keep top spacing */}
       <div className="h-6" />
 
-      <div className="flex justify-center mt-10 mb-8">
+      <div className="flex justify-center mt-10 mb-8 gap-4 px-10">
         <div className="relative w-full max-w-xl">
           <Input
             value={query}
@@ -89,6 +100,16 @@ export default function Sponsors() {
           />
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
         </div>
+        <Button
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
+          <RotateCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       <div className="space-y-6 px-10 pb-10">

@@ -161,60 +161,59 @@ export default function VerifiedDonations() {
   }
   return (
     <div className="flex flex-col items-center space-y-10 p-10 w-full">
-      {verifiedDonations?.map((sponsor, index1) => (
-        <div
-          key={sponsor.user}
-          className="w-11/12 max-w-5xl border rounded-2xl shadow-md overflow-hidden"
-        >
-          {/* Sponsor Name Header */}
-          <div className="p-4 text-lg text-gray-800 font-semibold border-b bg-gray-100">
-            {sponsor.name}
-          </div>
-
-          <Table className="w-full">
-            <TableHeader>
-              <TableRow className="bg-gray-200 hover:!bg-gray-200">
-                <TableHead className="w-1/2 text-gray-700 text-base font-semibold text-left pl-6 py-3">
-                  Date
-                </TableHead>
-                <TableHead className="w-1/4 text-gray-700 text-base font-semibold py-3">
-                  No of Children
-                </TableHead>
-                <TableHead className="w-1/4 text-gray-700 text-base font-semibold text-right pr-6 py-3">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {sponsor?.donations?.map((donation, index2) => (
-                <TableRow
-                  key={donation.donationId}
-                  className="hover:bg-gray-50 transition"
-                >
-                  <TableCell className="pl-6 text-gray-900 text-base font-medium py-3">
-                    {new Date(donation.date)
-                      .toLocaleDateString("en-GB")
-                      .replace(/\//g, "-")}
-                  </TableCell>
-                  <TableCell className="text-gray-900 text-base font-medium py-3">
-                    {donation.numChild}
-                  </TableCell>
-                  <TableCell className="pr-6 text-right py-3">
-                    {index1 === 0 && index2 === 0 && (
-                      <Button
-                        onClick={() => handleClick(sponsor.user, sponsor.name)}
-                        className="h-8 bg-[#025f43] hover:bg-[#1a604a] text-white px-5 py-1 rounded-lg text-base font-medium transition"
-                      >
-                        Allot Child
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      {verifiedDonations?.map((sponsor, index1) => (<div
+        key={sponsor.user}
+        className="w-11/12 max-w-5xl border rounded-2xl shadow-md overflow-hidden"
+      >
+        {/* Sponsor Name Header */}
+        <div className="p-4 text-lg text-gray-800 font-semibold border-b bg-gray-100">
+          {sponsor.name}
         </div>
+
+        <Table className="w-full">
+          <TableHeader>
+            <TableRow className="bg-gray-200 hover:!bg-gray-200">
+              <TableHead className="w-1/2 text-gray-700 text-base font-semibold text-left pl-6 py-3">
+                Date
+              </TableHead>
+              <TableHead className="w-1/4 text-gray-700 text-base font-semibold py-3">
+                No of Children
+              </TableHead>
+              <TableHead className="w-1/4 text-gray-700 text-base font-semibold text-right pr-6 py-3">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {sponsor?.donations?.map((donation, index2) => (
+              <TableRow
+                key={donation.donationId}
+                className="hover:bg-gray-50 transition"
+              >
+                <TableCell className="pl-6 text-gray-900 text-base font-medium py-3">
+                  {new Date(donation.date)
+                    .toLocaleDateString("en-GB")
+                    .replace(/\//g, "-")}
+                </TableCell>
+                <TableCell className="text-gray-900 text-base font-medium py-3">
+                  {donation.numChild}
+                </TableCell>
+                <TableCell className="pr-6 text-right py-3">
+                  {index1 === 0 && index2 === 0 && (
+                    <Button
+                      onClick={() => handleClick(sponsor.user, sponsor.name)}
+                      className="h-8 bg-[#025f43] hover:bg-[#1a604a] text-white px-5 py-1 rounded-lg text-base font-medium transition"
+                    >
+                      Allot Child
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
       ))}
     </div>
   );
