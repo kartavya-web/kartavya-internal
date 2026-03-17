@@ -28,9 +28,9 @@ const cards = [
   },
   {
     icon: "/donation.png",
-    title: "Add Donation",
-    desc: "Add donation details to the system.",
-    path: "/allotment/addDonationsToCSM",
+    title: "Donation Pipeline",
+    desc: "Process verified donations",
+    path: "/allotment/pipeline",
   },
   {
     icon: "/allotment.png",

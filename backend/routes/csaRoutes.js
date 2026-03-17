@@ -8,5 +8,7 @@ router.get("/available", csaController.getChildTobeAlloted);
 router.route("/allot").patch(csaController.allotChild);
 router.route("/deallot").patch(csaController.deAllotChild);
 router.route("/addDonationsToCSM").post(csaController.addDonationsToCSM);
+router.route("/process-donation").post(csaController.processDonation);
+router.route("/pipeline").get(csaController.getDonationPipeline);
 
 module.exports = router;

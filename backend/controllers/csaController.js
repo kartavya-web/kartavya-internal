@@ -4,6 +4,7 @@ const Student = require("./../models/Student");
 const User = require("./../models/User");
 const generateEmailTemplate = require("../Utils/mailTemplate");
 const { sendEmail } = require("../Utils/mailer");
+const Donation = require("./../models/Donation");
 
 // @route GET/api/allotment/
 const getVerifiedDonations = asyncHandler(async (req, res) => {
@@ -28,7 +29,6 @@ const getChildTobeAlloted = asyncHandler(async (req, res) => {
     },
   };
 
-  // ✅ ONLY exclude sponsor-allotted children IF sponsorid exists
   if (sponsorid) {
     query.sponsorId = { $not: { $in: [sponsorid] } };
   }
@@ -227,12 +227,199 @@ const addDonationsToCSM = asyncHandler(async (req, res) => {
   }
 });
 
+// @route POST /api/allotment/process-donation
+const processDonation = asyncHandler(async (req, res) => {
+  const { donationId, academicYear } = req.body;
+
+  if (!donationId || !academicYear) {
+    return res.status(400).json({ message: "Missing required fields: donationId, academicYear" });
+  }
+
+  try {
+    const Donation = require("./../models/Donation");
+    
+    const donation = await Donation.findById(donationId).populate("user");
+    if (!donation) {
+      return res.status(404).json({ message: "Donation not found" });
+    }
+
+    if (donation.processed) {
+      return res.status(400).json({ message: "This donation has already been processed" });
+    }
+
+    const sponsor = await User.findById(donation.user._id);
+    if (!sponsor) {
+      return res.status(404).json({ message: "Sponsor not found" });
+    }
+
+    const newCount = donation.numChild;
+    const currentCount = sponsor.sponsoredStudents?.length || 0;
+
+    // **CASE 1: newCount > currentCount (Increase in Sponsorship)**
+    if (newCount > currentCount) {
+      const additionalChildren = newCount - currentCount;
+      
+      // Add extra children count to CSM table for new allotment
+      await ChildSponsorMap.updateOne(
+        { user: donation.user._id },
+        {
+          $set: { 
+            name: sponsor.name,
+            lastUpdated: new Date() 
+          },
+          $push: {
+            donations: {
+              donationId: donationId,
+              date: donation.donationDate,
+              numChild: additionalChildren,
+            },
+          },
+        },
+        { upsert: true }
+      );
+
+      console.log(`[Case 1] Sponsor ${donation.user._id}: Increased sponsorship. ${additionalChildren} new children pending allotment.`);
+    }
+
+    // **CASE 2: newCount < currentCount (Reduction in Sponsorship)**
+    else if (newCount < currentCount) {
+      const studentsToDeallot = currentCount - newCount;
+      const existingStudents = sponsor.sponsoredStudents || [];
+      
+      // Retain only newCount students, remove the rest
+      const studentsToRemove = existingStudents.slice(newCount);
+      const retainedStudents = existingStudents.slice(0, newCount);
+
+      // De-allocate students
+      for (const studentId of studentsToRemove) {
+        const student = await Student.findById(studentId);
+        if (student) {
+          student.sponsorId = student.sponsorId.filter(
+            (sId) => sId.toString() !== donation.user._id.toString()
+          );
+          await student.save();
+          console.log(`[Case 2] De-allocated student ${studentId} from sponsor ${donation.user._id}`);
+        }
+      }
+
+      // Update sponsor with retained students
+      sponsor.sponsoredStudents = retainedStudents;
+      await sponsor.save();
+
+      console.log(`[Case 2] Sponsor ${donation.user._id}: Reduced sponsorship. De-allocated ${studentsToDeallot} students.`);
+    }
+
+    // **CASE 3: newCount == currentCount (No Change)**
+    else {
+      console.log(`[Case 3] Sponsor ${donation.user._id}: Sponsorship renewed for academic year ${academicYear}. No changes required.`);
+    }
+
+    await Donation.updateOne(
+      { _id: donationId },
+      {
+        $set: {
+          processed: true,
+          academicYear: academicYear,
+          lastProcessedDate: new Date(),
+        }
+      }
+    );
+
+    let caseType = newCount > currentCount ? "1 (Increase)" : newCount < currentCount ? "2 (Reduction)" : "3 (No Change)";
+
+    res.status(200).json({
+      success: true,
+      message: `Donation processed successfully - Case ${caseType}`,
+      details: {
+        donationId: donationId,
+        donationAmount: donation.amount,
+        newCount: newCount,
+        currentCount: currentCount,
+        academicYear: academicYear,
+        caseType: caseType,
+      }
+    });
+
+  } catch (error) {
+    console.error("Donation processing failed:", error);
+    res.status(400).json({
+      message: error.message || "An error occurred during donation processing.",
+    });
+  }
+});
+
+const getDonationPipeline = asyncHandler(async (req, res) => {
+  try {
+    
+    const pipelineDonations = await Donation.find({
+      verified: true,
+      rejected: false,
+      processed: false,
+    })
+      .populate("user", "name email sponsoredStudents batch")
+      .sort({ donationDate: -1 })
+      .lean();
+
+    const donationsByUser = {};
+    const Student = require("./../models/Student");
+
+    for (const donation of pipelineDonations) {
+      const userId = donation.user._id.toString();
+      
+      if (!donationsByUser[userId]) {
+        const studentCount = await Student.countDocuments({ sponsorId: donation.user._id });
+        
+        donationsByUser[userId] = {
+          userId: donation.user._id,
+          userName: donation.user.name,
+          userEmail: donation.user.email,
+          userBatch: donation.user.batch, 
+          currentCount: studentCount, 
+          donations: [],
+          totalDonationAmount: 0,
+          totalNumChild: 0,
+        };
+      }
+      
+      donationsByUser[userId].donations.push({
+        id: donation._id,
+        amount: donation.amount,
+        donationDate: donation.donationDate,
+        numChild: donation.numChild,
+        contactNumber: donation.contactNumber,
+        recieptUrl: donation.recieptUrl,
+        academicYear: donation.academicYear, 
+      });
+      console.log(`Donation ID: ${donation._id}, Academic Year: ${donation.academicYear}`);
+      
+      donationsByUser[userId].totalDonationAmount += donation.amount;
+      donationsByUser[userId].totalNumChild += donation.numChild;
+    }
+
+    const groupedDonations = Object.values(donationsByUser);
+
+    res.status(200).json({
+      success: true,
+      data: groupedDonations,
+      total: pipelineDonations.length,
+      uniqueSponsors: groupedDonations.length,
+    });
+  } catch (error) {
+    console.error("Error fetching donation pipeline:", error);
+    res.status(400).json({
+      message: error.message || "Failed to fetch donation pipeline.",
+    });
+  }
+});
+
 module.exports = {
   getVerifiedDonations,
   getChildTobeAlloted,
   allotChild,
   deAllotChild,
   addDonationsToCSM,
+  processDonation,
+  getDonationPipeline,
 };
 
 // donation_id = 679bbe64100a5ecc13b97481
