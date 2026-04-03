@@ -88,24 +88,22 @@ const getUserById = async (req, res) => {
 // GET /api/users/sponsors  -> returns sponsors populated with students
 const getAllSponsors = async (req, res) => {
   try {
-    console.log('Getting all sponsors...');
-    const sponsors = await User.find()
+    const sponsors = await User.find({
+      sponsoredStudents: { $exists: true, $ne: [] }
+    })
       .populate({
         path: "sponsoredStudents",
         select: "studentName rollNumber class centre school profilePhoto sponsorshipStatus"
       })
       .select('name email contactNumber dateOfBirth gender currentJob totalDonation sponsoredStudents profileImage')
       .lean();
-    
-    // Sort sponsors by number of sponsored students in descending order
-    const sortedSponsors = sponsors.sort((a, b) => 
-      (b.sponsoredStudents?.length || 0) - (a.sponsoredStudents?.length || 0)
+
+    const sortedSponsors = sponsors.sort(
+      (a, b) => b.sponsoredStudents.length - a.sponsoredStudents.length
     );
-    
-    console.log('Found sponsors:', sortedSponsors);
+
     res.status(200).json(sortedSponsors);
   } catch (err) {
-    console.error("getAllSponsors error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };

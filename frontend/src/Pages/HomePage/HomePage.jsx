@@ -76,6 +76,7 @@ const HomePage = () => {
   };
 
   const handleCardClick = (card) => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     navigate(card.path);
   };
 

@@ -72,8 +72,6 @@ export default function Sponsors() {
 
   const toggleExpand = (id) => setExpanded(expanded === id ? null : id);
 
-  // show search bar immediately and render inline loader in the list area
-
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar removed as requested; keep top spacing */}
@@ -105,8 +103,9 @@ export default function Sponsors() {
             <div className="flex flex-col md:flex-row md:items-center justify-between">
               <div className="flex flex-col items-center md:items-start space-y-3 md:space-y-0 md:space-x-4 md:flex-row">
                 <img
-                  src={sponsor.profileImage || "https://via.placeholder.com/120x120"}
+                  src={sponsor.profileImage || "/user.svg"}
                   alt={sponsor.name}
+                  onError={(e) => (e.target.src = "/user.svg")}
                   className="w-20 h-20 object-cover rounded-lg bg-muted text-center"
                 />
                 <div className="text-center md:text-left">
