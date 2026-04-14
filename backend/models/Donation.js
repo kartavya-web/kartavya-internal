@@ -42,6 +42,18 @@ const DonationSchema = new Schema({
     type: Number,
     default: 0,
   },
+  processed: {
+    type: Boolean,
+    default: false,
+  },
+  academicYear: {
+    type: String,
+    default: null,
+  },
+  lastProcessedDate: {
+    type: Date,
+    default: null,
+  },
 }, {timestamps: true});
 
 module.exports = mongoose.model("Donation", DonationSchema);
