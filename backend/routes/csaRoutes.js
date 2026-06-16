@@ -11,4 +11,9 @@ router.route("/addDonationsToCSM").post(csaController.addDonationsToCSM);
 router.route("/process-donation").post(csaController.processDonation);
 router.route("/pipeline").get(csaController.getDonationPipeline);
 
+router.get("/session/:session", csaController.getSessionSponsorshipData);
+router.get("/sessions", csaController.getAvailableSessions);
+
+router.get("/session/:session/excel", csaController.exportSessionExcel);
+
 module.exports = router;

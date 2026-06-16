@@ -84,6 +84,20 @@ const studentSchema = new mongoose.Schema({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     default: [],
   },
+  sponsorshipHistory: [
+  {
+    session: {
+      type: String,
+      required: true,
+    },
+    sponsors: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+  },
+],
   sponsorshipPercent: {
     type: Number,
     required: false,
@@ -122,11 +136,11 @@ const studentSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  profileAadharVerified:{
+  profileAadharVerified: {
     type: Boolean,
     default: false,
   }
-}, {timestamps: true});
+}, { timestamps: true });
 
 const StudentModel = mongoose.model("Student", studentSchema);
 module.exports = StudentModel;

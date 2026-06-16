@@ -5,6 +5,7 @@ const User = require("./../models/User");
 const generateEmailTemplate = require("../Utils/mailTemplate");
 const { sendEmail } = require("../Utils/mailer");
 const Donation = require("./../models/Donation");
+const ExcelJS = require("exceljs");
 
 // @route GET/api/allotment/
 const getVerifiedDonations = asyncHandler(async (req, res) => {
@@ -77,7 +78,7 @@ const allotChild = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Sponsor not found" });
     }
 
-    const student = await Student.findById(studentId).lean();
+    const student = await Student.findById(studentId);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
@@ -104,15 +105,40 @@ const allotChild = asyncHandler(async (req, res) => {
     // Push studentId into the sponsoredStudents attribute of Sponsor
     await User.updateOne(
       { _id: sponsorId },
-      { $addToSet: { sponsoredStudents: studentId } }
+      { $addToSet: { sponsoredStudents: studentId } },
+
     );
 
     // Push sponsorId into the sponsorId attribute of Student
-    await Student.updateOne(
-      { _id: studentId },
-      { $addToSet: { sponsorId: sponsorId } }
+    student.sponsorId.addToSet(sponsorId);
+
+    const session = student.currentSession;
+
+    if (!student.sponsorshipHistory) {
+      student.sponsorshipHistory = [];
+    }
+
+    let history = student.sponsorshipHistory.find(
+      h => h.session === session
     );
-    
+
+    if (history) {
+      const alreadyExists = history.sponsors.some(
+        s => s.toString() === sponsorId.toString()
+      );
+
+      if (!alreadyExists) {
+        history.sponsors.push(sponsorId);
+      }
+    } else {
+      student.sponsorshipHistory.push({
+        session,
+        sponsors: [sponsorId]
+      });
+    }
+
+    await student.save();
+
     // Decrement numChild in the first donation object
     firstDonation.numChild -= 1;
 
@@ -147,6 +173,176 @@ const allotChild = asyncHandler(async (req, res) => {
     res.status(400).json({
       message:
         error.message || "An error occurred during the allotment process.",
+    });
+  }
+});
+
+const getSessionSponsorshipData = asyncHandler(async (req, res) => {
+  try {
+    const { session } = req.params;
+
+    const students = await Student.find({
+      sponsorshipHistory: {
+        $elemMatch: {
+          session: session,
+        },
+      },
+    })
+      .populate({
+        path: "sponsorshipHistory.sponsors",
+        select: "name email contactNumber profileImage",
+      })
+      .select(
+        "studentName rollNumber class centre school profilePhoto sponsorshipHistory"
+      )
+      .lean();
+
+    const formattedStudents = students.map((student) => {
+      const history = student.sponsorshipHistory.find(
+        (h) => h.session === session
+      );
+
+      return {
+        _id: student._id,
+        studentName: student.studentName,
+        rollNumber: student.rollNumber,
+        class: student.class,
+        centre: student.centre,
+        school: student.school,
+        profilePhoto: student.profilePhoto,
+
+        sponsorCount: history?.sponsors?.length || 0,
+
+        sponsors:
+          history?.sponsors?.map((sponsor) => ({
+            _id: sponsor._id,
+            name: sponsor.name,
+            email: sponsor.email,
+            contactNumber: sponsor.contactNumber,
+            profileImage: sponsor.profileImage,
+          })) || [],
+      };
+    });
+
+    const uniqueSponsors = new Set();
+
+    formattedStudents.forEach((student) => {
+      student.sponsors.forEach((sponsor) => {
+        uniqueSponsors.add(sponsor._id.toString());
+      });
+    });
+
+    res.status(200).json({
+      success: true,
+      session,
+      stats: {
+        totalStudents: formattedStudents.length,
+        totalSponsors: uniqueSponsors.size,
+      },
+      students: formattedStudents,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+const getAvailableSessions = asyncHandler(async (req, res) => {
+  const sessions = await Student.distinct(
+    "sponsorshipHistory.session"
+  );
+
+  sessions.sort().reverse();
+
+  res.status(200).json({
+    sessions,
+  });
+});
+
+const exportSessionExcel = asyncHandler(async (req, res) => {
+  try {
+
+    const { session } = req.params;
+
+    const students = await Student.find({
+      sponsorshipHistory: {
+        $elemMatch: {
+          session: session,
+        },
+      },
+    })
+      .populate({
+        path: "sponsorshipHistory.sponsors",
+        select: "name email contactNumber profileImage",
+      })
+      .select(
+        "studentName class centre school profilePhoto sponsorshipHistory"
+      )
+      .lean();
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(session);
+
+    worksheet.columns = [
+      { header: "Student Name", key: "studentName", width: 25 },
+      { header: "Class", key: "class", width: 10 },
+      { header: "Centre", key: "centre", width: 20 },
+      { header: "School", key: "school", width: 30 },
+      { header: "Sponsor Name", key: "sponsorName", width: 25 },
+      { header: "Sponsor Email", key: "sponsorEmail", width: 30 },
+      { header: "Contact", key: "contact", width: 20 },
+    ];
+
+
+    for (const student of students) {
+      const history = student.sponsorshipHistory.find(
+        (h) => h.session === session
+      );
+
+      if (!history || !history.sponsors?.length) {
+        continue;
+      }
+      console.log(history.sponsors[0]);
+
+      for (const sponsor of history.sponsors) {
+        worksheet.addRow({
+          studentName: student.studentName,
+          class: student.class,
+          centre: student.centre,
+          school: student.school || "N/A",
+          sponsorName: sponsor.name,
+          sponsorEmail: sponsor.email,
+          contact: sponsor.contactNumber ? Number(sponsor.contactNumber) : "",
+        });
+      }
+    }
+
+    worksheet.getRow(1).font = {
+      bold: true,
+    };
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${session}.xlsx`
+    );
+
+    await workbook.xlsx.write(res);
+
+    res.end();
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 });
@@ -193,7 +389,7 @@ const addDonationsToCSM = asyncHandler(async (req, res) => {
 
   console.log(existingDonationId, "existingDonationId");
 
-  if(existingDonationId) {
+  if (existingDonationId) {
     return res.status(400).json({ message: "This donation already exists in CSM Table." });
   }
 
@@ -227,6 +423,41 @@ const addDonationsToCSM = asyncHandler(async (req, res) => {
   }
 });
 
+const addSponsorHistoryForStudents = async (studentIds, sponsorId) => {
+  const students = await Student.find({
+    _id: { $in: studentIds }
+  });
+
+  for (const student of students) {
+    const session = student.currentSession;
+
+    if (!student.sponsorshipHistory) {
+      student.sponsorshipHistory = [];
+    }
+
+    let history = student.sponsorshipHistory?.find(
+      h => h.session === session
+    );
+
+    if (history) {
+      const alreadyExists = history.sponsors.some(
+        s => s.toString() === sponsorId.toString()
+      );
+
+      if (!alreadyExists) {
+        history.sponsors.push(sponsorId);
+      }
+    } else {
+      student.sponsorshipHistory.push({
+        session,
+        sponsors: [sponsorId]
+      });
+    }
+
+    await student.save();
+  }
+};
+
 // @route POST /api/allotment/process-donation
 const processDonation = asyncHandler(async (req, res) => {
   const { donationId, academicYear } = req.body;
@@ -237,7 +468,7 @@ const processDonation = asyncHandler(async (req, res) => {
 
   try {
     const Donation = require("./../models/Donation");
-    
+
     const donation = await Donation.findById(donationId).populate("user");
     if (!donation) {
       return res.status(404).json({ message: "Donation not found" });
@@ -253,19 +484,33 @@ const processDonation = asyncHandler(async (req, res) => {
     }
 
     const newCount = donation.numChild;
-    const currentCount = sponsor.sponsoredStudents?.length || 0;
-
+    const currentCount = await Student.countDocuments({
+      sponsorId: sponsor._id,
+    });
     // **CASE 1: newCount > currentCount (Increase in Sponsorship)**
     if (newCount > currentCount) {
       const additionalChildren = newCount - currentCount;
-      
+
+      // to get all the students sponsored last session by this
+      const existingStudents = await Student.find(
+        { sponsorId: sponsor._id },
+        "_id"
+      );
+
+      // Add sponsor history for the retained students
+      await addSponsorHistoryForStudents(
+        existingStudents.map(x => x._id),
+        sponsor._id
+      );
+
       // Add extra children count to CSM table for new allotment
-      await ChildSponsorMap.updateOne(
+      await ChildSponsorMap.findOneAndUpdate(
         { user: donation.user._id },
         {
-          $set: { 
+          $set: {
+            user: donation.user._id,
             name: sponsor.name,
-            lastUpdated: new Date() 
+            lastUpdated: new Date(),
           },
           $push: {
             donations: {
@@ -275,7 +520,11 @@ const processDonation = asyncHandler(async (req, res) => {
             },
           },
         },
-        { upsert: true }
+        {
+          upsert: true,
+          new: true,
+          runValidators: true,
+        }
       );
 
       console.log(`[Case 1] Sponsor ${donation.user._id}: Increased sponsorship. ${additionalChildren} new children pending allotment.`);
@@ -285,10 +534,16 @@ const processDonation = asyncHandler(async (req, res) => {
     else if (newCount < currentCount) {
       const studentsToDeallot = currentCount - newCount;
       const existingStudents = sponsor.sponsoredStudents || [];
-      
+
       // Retain only newCount students, remove the rest
       const studentsToRemove = existingStudents.slice(newCount);
       const retainedStudents = existingStudents.slice(0, newCount);
+
+      // Add sponsor history for the retained students
+      await addSponsorHistoryForStudents(
+        retainedStudents,
+        sponsor._id
+      );
 
       // De-allocate students
       for (const studentId of studentsToRemove) {
@@ -311,6 +566,17 @@ const processDonation = asyncHandler(async (req, res) => {
 
     // **CASE 3: newCount == currentCount (No Change)**
     else {
+
+      const existingStudents = await Student.find(
+        { sponsorId: sponsor._id },
+        "_id"
+      );
+
+      await addSponsorHistoryForStudents(
+        existingStudents.map(x => x._id),
+        sponsor._id
+      );
+
       console.log(`[Case 3] Sponsor ${donation.user._id}: Sponsorship renewed for academic year ${academicYear}. No changes required.`);
     }
 
@@ -350,7 +616,7 @@ const processDonation = asyncHandler(async (req, res) => {
 
 const getDonationPipeline = asyncHandler(async (req, res) => {
   try {
-    
+
     const pipelineDonations = await Donation.find({
       verified: true,
       rejected: false,
@@ -364,23 +630,31 @@ const getDonationPipeline = asyncHandler(async (req, res) => {
     const Student = require("./../models/Student");
 
     for (const donation of pipelineDonations) {
+      if (!donation.user) {
+        console.error(
+          "Invalid donation found:",
+          donation._id
+        );
+        continue;
+      }
+
       const userId = donation.user._id.toString();
-      
+
       if (!donationsByUser[userId]) {
         const studentCount = await Student.countDocuments({ sponsorId: donation.user._id });
-        
+
         donationsByUser[userId] = {
           userId: donation.user._id,
           userName: donation.user.name,
           userEmail: donation.user.email,
-          userBatch: donation.user.batch, 
-          currentCount: studentCount, 
+          userBatch: donation.user.batch,
+          currentCount: studentCount,
           donations: [],
           totalDonationAmount: 0,
           totalNumChild: 0,
         };
       }
-      
+
       donationsByUser[userId].donations.push({
         id: donation._id,
         amount: donation.amount,
@@ -388,10 +662,10 @@ const getDonationPipeline = asyncHandler(async (req, res) => {
         numChild: donation.numChild,
         contactNumber: donation.contactNumber,
         recieptUrl: donation.recieptUrl,
-        academicYear: donation.academicYear, 
+        academicYear: donation.academicYear,
       });
       console.log(`Donation ID: ${donation._id}, Academic Year: ${donation.academicYear}`);
-      
+
       donationsByUser[userId].totalDonationAmount += donation.amount;
       donationsByUser[userId].totalNumChild += donation.numChild;
     }
@@ -420,6 +694,9 @@ module.exports = {
   addDonationsToCSM,
   processDonation,
   getDonationPipeline,
+  getSessionSponsorshipData,
+  getAvailableSessions,
+  exportSessionExcel
 };
 
 // donation_id = 679bbe64100a5ecc13b97481
