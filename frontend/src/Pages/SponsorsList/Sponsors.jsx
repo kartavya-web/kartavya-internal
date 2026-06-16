@@ -70,6 +70,8 @@ export default function Sponsors() {
   };
 
   const filteredSponsors = sponsorsData
+    .filter((sponsor) => (sponsor.sponsoredStudents?.length || 0) > 0 ||
+      (sponsor.totalDonation || 0) > 0)
     .filter((sponsor) => {
       const q = (query || "").toLowerCase().trim();
       if (!q) return true;
@@ -117,96 +119,118 @@ export default function Sponsors() {
           </div>
         ) : (
           filteredSponsors.map((sponsor) => (
-          <div
-            key={sponsor._id}
-            className="bg-card border border-border shadow-sm rounded-lg p-6 flex flex-col transition hover:shadow-md"
-          >
-            <div className="flex flex-col md:flex-row md:items-center justify-between">
-              <div className="flex flex-col items-center md:items-start space-y-3 md:space-y-0 md:space-x-4 md:flex-row">
-                <img
-                  src={sponsor.profileImage || "/user.svg"}
-                  alt={sponsor.name}
-                  onError={(e) => (e.target.src = "/user.svg")}
-                  className="w-20 h-20 object-cover rounded-lg bg-muted text-center"
-                />
-                <div className="text-center md:text-left">
-                  <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                    {sponsor.name}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1">{sponsor.email}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Contact: {sponsor.contactNumber}</p>
+            <div
+              key={sponsor._id}
+              className="bg-card border border-border shadow-sm rounded-lg p-6 flex flex-col transition hover:shadow-md"
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between">
+                <div className="flex flex-col items-center md:items-start space-y-3 md:space-y-0 md:space-x-4 md:flex-row">
+                  <img
+                    src={sponsor.profileImage || "/user.svg"}
+                    alt={sponsor.name}
+                    onError={(e) => (e.target.src = "/user.svg")}
+                    className="w-20 h-20 object-cover rounded-lg bg-muted text-center"
+                  />
+                  <div className="text-center md:text-left">
+                    <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                      {sponsor.name}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">{sponsor.email}</p>
+                    <p className="text-sm text-muted-foreground mt-1">Contact: {sponsor.contactNumber}</p>
+                  </div>
+                </div>
+
+                <div className="mt-5 md:mt-0 flex flex-col items-end gap-2">
+
+                  <div className="flex items-center space-x-3">
+                    <p className="text-sm font-medium text-foreground">
+                      Students Sponsored
+                    </p>
+
+                    <Badge
+                      variant="secondary"
+                      className="font-semibold bg-[#21526E] text-white"
+                    >
+                      {sponsor.sponsoredStudents?.length || 0}
+                    </Badge>
+                  </div>
+
+                  {/* <div className="flex items-center space-x-3">
+                    <p className="text-sm font-medium text-foreground">
+                      Total Donation
+                    </p>
+
+                    <Badge
+                      variant="secondary"
+                      className="font-semibold bg-green-600 text-white"
+                    >
+                      ₹{(sponsor.totalDonation || 0).toLocaleString()}
+                    </Badge>
+                  </div> */}
+
                 </div>
               </div>
 
-              <div className="mt-5 md:mt-0 flex items-center space-x-3">
-                <p className="text-sm font-medium text-foreground">Number Of Students Sponsored</p>
-                <Badge variant="secondary" className="font-semibold bg-[#21526E] text-white">
-                   {sponsor.sponsoredStudents?.length || 0}
-                  </Badge>
+              <div className="flex justify-end mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleExpand(sponsor._id)}
+                  className="gap-2"
+                >
+                  {expanded === sponsor._id ? (
+                    <>
+                      Hide Students <ChevronUp className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      View Students <ChevronDown className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
               </div>
-            </div>
 
-            <div className="flex justify-end mt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => toggleExpand(sponsor._id)}
-                className="gap-2"
-              >
-                {expanded === sponsor._id ? (
-                  <>
-                    Hide Students <ChevronUp className="w-4 h-4" />
-                  </>
-                ) : (
-                  <>
-                    View Students <ChevronDown className="w-4 h-4" />
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {expanded === sponsor._id && (
-              <div className="mt-6 border-t border-border pt-6">
-                <Table className="text-sm">
-                  <TableHeader>
-                    <tr className="bg-gradient-to-r from-primary/10 to-primary/5 border-b-2 border-primary/30">
-                      <TableHead className="font-bold text-primary py-3 px-4">Name</TableHead>
-                      <TableHead className="font-bold text-primary py-3 px-4">Class</TableHead>
-                      <TableHead className="font-bold text-primary py-3 px-4">Centre</TableHead>
-                      <TableHead className="font-bold text-primary py-3 px-4">School Name</TableHead>
-                    </tr>
-                  </TableHeader>
-                  <TableBody>
-                    {sponsor.sponsoredStudents?.map((student, index) => (
-                      <TableRow 
-                        key={student._id} 
-                        className={`border-b border-border transition-all duration-200 ${
-                          index % 2 === 0 ? "bg-background" : "bg-primary/5"
-                        } hover:bg-primary/10`}
-                      >
-                        <TableCell className="text-foreground py-3 px-4">
-                          <Button
-                            asChild
-                            variant="link"
-                            className="p-0 h-auto text-primary font-semibold hover:text-primary/80 hover:underline underline-offset-2 transition-all duration-200"
-                          >
-                            <Link
-                              to={`/admin/${encodeURIComponent(student.rollNumber)}`}
+              {expanded === sponsor._id && (
+                <div className="mt-6 border-t border-border pt-6">
+                  <Table className="text-sm">
+                    <TableHeader>
+                      <tr className="bg-gradient-to-r from-primary/10 to-primary/5 border-b-2 border-primary/30">
+                        <TableHead className="font-bold text-primary py-3 px-4">Name</TableHead>
+                        <TableHead className="font-bold text-primary py-3 px-4">Class</TableHead>
+                        <TableHead className="font-bold text-primary py-3 px-4">Centre</TableHead>
+                        <TableHead className="font-bold text-primary py-3 px-4">School Name</TableHead>
+                      </tr>
+                    </TableHeader>
+                    <TableBody>
+                      {sponsor.sponsoredStudents?.map((student, index) => (
+                        <TableRow
+                          key={student._id}
+                          className={`border-b border-border transition-all duration-200 ${index % 2 === 0 ? "bg-background" : "bg-primary/5"
+                            } hover:bg-primary/10`}
+                        >
+                          <TableCell className="text-foreground py-3 px-4">
+                            <Button
+                              asChild
+                              variant="link"
+                              className="p-0 h-auto text-primary font-semibold hover:text-primary/80 hover:underline underline-offset-2 transition-all duration-200"
                             >
-                              {student.studentName}
-                            </Link>
-                          </Button>
-                        </TableCell>
-                        <TableCell className="text-foreground py-3 px-4 font-medium">{student.class}</TableCell>
-                        <TableCell className="text-foreground py-3 px-4 font-medium">{student.centre}</TableCell>
-                        <TableCell className="text-foreground py-3 px-4 font-medium">{student.school || "N/A"}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
+                              <Link
+                                to={`/admin/${encodeURIComponent(student.rollNumber)}`}
+                              >
+                                {student.studentName}
+                              </Link>
+                            </Button>
+                          </TableCell>
+                          <TableCell className="text-foreground py-3 px-4 font-medium">{student.class}</TableCell>
+                          <TableCell className="text-foreground py-3 px-4 font-medium">{student.centre}</TableCell>
+                          <TableCell className="text-foreground py-3 px-4 font-medium">{student.school || "N/A"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
           ))
         )}
       </div>

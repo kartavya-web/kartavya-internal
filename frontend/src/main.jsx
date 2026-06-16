@@ -12,6 +12,7 @@ import "./index.css";
 
 import Sample from "@/components/Form/MultiSelect";
 import Sponsors from "./Pages/SponsorsList/Sponsors";
+import SponsorshipHistory from "./Pages/SponsorshipHistory/SponsorshipHistory";
 import EnterStudentDetails from "./Pages/AddNewStudent/EnterStudentDetails";
 import StudentSpreadsheet from "./Pages/StudentSpreadsheet/StudentSpreadsheet.jsx";
 import StudentProfile from "./Pages/StudentProfile/StudentProfile";
@@ -42,6 +43,8 @@ const router = createBrowserRouter(
       <Route path="available-students" element={<AvailableStudents />} />
 
       <Route path="sponsors" element={<Sponsors />} />
+      <Route path="/sponsorship-history" element={<SponsorshipHistory />} />
+
       <Route path="hello" element={<Sample />} />
 
       {/* Admin Routes */}

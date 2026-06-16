@@ -21,6 +21,13 @@ const cards = [
   },
 
   {
+    icon: "/history.png",
+    title: "Sponsorship History",
+    desc: "View sponsorship by session",
+    path: "/sponsorship-history",
+  },
+
+  {
     icon: "/add.png",
     title: "Add Student",
     desc: "Register new students",
@@ -38,6 +45,7 @@ const cards = [
     desc: "Assign sponsors to students",
     path: "/allotment",
   },
+  
 ];
 
 const HomePage = () => {
@@ -237,7 +245,7 @@ const HomePage = () => {
                 </p>
               </div>
             ))}
-            
+
             {/* Available Students Card */}
             <div
               onClick={() => navigate("/available-students")}
@@ -256,7 +264,7 @@ const HomePage = () => {
               </p>
             </div>
           </div>
-     </section>
+        </section>
       </main>
       <footer
         id="about"
