@@ -51,12 +51,15 @@ export default function SponsorshipHistory() {
 
       if (availableSessions.length > 0) {
         setSelectedSession(availableSessions[0]);
+      } else {
+        setLoading(false);
       }
     } catch (err) {
       console.error(
         "Error fetching sessions:",
         err.response?.data || err.message
       );
+      setLoading(false);
     }
   };
 
@@ -79,6 +82,11 @@ export default function SponsorshipHistory() {
         "Error fetching sponsorship history:",
         err.response?.data || err.message
       );
+      setStudentsData([]);
+      setStats({
+        totalStudents: 0,
+        totalSponsors: 0,
+      });
     }
   };
 
@@ -151,20 +159,23 @@ export default function SponsorshipHistory() {
       <div className="h-6" />
 
       <div className="flex flex-wrap justify-center items-center gap-4 mt-10 mb-8 px-10">
-        <select
-          value={selectedSession}
-          onChange={(e) => setSelectedSession(e.target.value)}
-          className="border border-border rounded-lg px-4 py-2 bg-background"
-        >
-          {sessions.map((session) => (
-            <option
-              key={session}
-              value={session}
-            >
-              {session}
-            </option>
-          ))}
-        </select>
+        {sessions.length === 0 ? (
+          <div className="text-center py-20">
+            There are no sponsored students for this session.
+          </div>
+        ) : (
+          <select
+            value={selectedSession}
+            onChange={(e) => setSelectedSession(e.target.value)}
+            className="border border-border rounded-lg px-4 py-2 bg-background"
+          >
+            {sessions.map((session) => (
+              <option key={session} value={session}>
+                {session}
+              </option>
+            ))}
+          </select>
+        )}
 
         <div className="relative w-full max-w-xl">
           <Input
@@ -191,6 +202,7 @@ export default function SponsorshipHistory() {
         </Button>
         <Button
           onClick={downloadExcel}
+          disabled={studentsData.length === 0}
           variant="outline"
           size="sm"
           className="gap-2"
@@ -227,126 +239,131 @@ export default function SponsorshipHistory() {
           <div className="py-20">
             <Loader />
           </div>
-        ) : (
-          filteredStudents.map((student) => (
-            <div
-              key={student._id}
-              className="bg-card border border-border shadow-sm rounded-lg p-6 flex flex-col transition hover:shadow-md"
-            >
-              <div className="flex flex-col md:flex-row md:items-center justify-between">
-                <div className="flex flex-col items-center md:items-start space-y-3 md:space-y-0 md:space-x-4 md:flex-row">
-                  <img
-                    src={student.profilePhoto || "/user.svg"}
-                    alt={student.studentName}
-                    onError={(e) => (e.target.src = "/user.svg")}
-                    className="w-20 h-20 object-cover rounded-lg bg-muted"
-                  />
+        ) : filteredStudents.length === 0 ? (
+          <div className="text-center py-20 text-muted-foreground">
+            No sponsorship data found for this session.
+          </div>
+        )
+          : (
+            filteredStudents.map((student) => (
+              <div
+                key={student._id}
+                className="bg-card border border-border shadow-sm rounded-lg p-6 flex flex-col transition hover:shadow-md"
+              >
+                <div className="flex flex-col md:flex-row md:items-center justify-between">
+                  <div className="flex flex-col items-center md:items-start space-y-3 md:space-y-0 md:space-x-4 md:flex-row">
+                    <img
+                      src={student.profilePhoto || "/user.svg"}
+                      alt={student.studentName}
+                      onError={(e) => (e.target.src = "/user.svg")}
+                      className="w-20 h-20 object-cover rounded-lg bg-muted"
+                    />
 
-                  <div className="text-center md:text-left">
-                    <Link
-                      to={`/admin/${encodeURIComponent(student.rollNumber)}`}
-                      className="flex items-center h-full"
+                    <div className="text-center md:text-left">
+                      <Link
+                        to={`/admin/${encodeURIComponent(student.rollNumber)}`}
+                        className="flex items-center h-full"
+                      >
+                        <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                          {student.studentName}
+                        </h2>
+                      </Link>
+
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Class: {student.class}
+                      </p>
+
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Centre: {student.centre}
+                      </p>
+
+                      <p className="text-sm text-muted-foreground mt-1">
+                        School: {student.school || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 md:mt-0 flex items-center space-x-3">
+                    <p className="text-sm font-medium text-foreground">
+                      Number Of Sponsors
+                    </p>
+
+                    <Badge
+                      variant="secondary"
+                      className="font-semibold bg-[#21526E] text-white"
                     >
-                      <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                        {student.studentName}
-                      </h2>
-                    </Link>
-
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Class: {student.class}
-                    </p>
-
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Centre: {student.centre}
-                    </p>
-
-                    <p className="text-sm text-muted-foreground mt-1">
-                      School: {student.school || "N/A"}
-                    </p>
+                      {student.sponsorCount || 0}
+                    </Badge>
                   </div>
                 </div>
 
-                <div className="mt-5 md:mt-0 flex items-center space-x-3">
-                  <p className="text-sm font-medium text-foreground">
-                    Number Of Sponsors
-                  </p>
-
-                  <Badge
-                    variant="secondary"
-                    className="font-semibold bg-[#21526E] text-white"
+                <div className="flex justify-end mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleExpand(student._id)}
+                    className="gap-2"
                   >
-                    {student.sponsorCount || 0}
-                  </Badge>
+                    {expanded === student._id ? (
+                      <>
+                        Hide Sponsors
+                        <ChevronUp className="w-4 h-4" />
+                      </>
+                    ) : (
+                      <>
+                        View Sponsors
+                        <ChevronDown className="w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
                 </div>
+
+                {expanded === student._id && (
+                  <div className="mt-6 border-t border-border pt-6">
+                    <Table className="text-sm">
+                      <TableHeader>
+                        <tr className="bg-gradient-to-r from-primary/10 to-primary/5 border-b-2 border-primary/30">
+                          <TableHead className="font-bold text-primary py-3 px-4">
+                            Name
+                          </TableHead>
+
+                          <TableHead className="font-bold text-primary py-3 px-4">
+                            Email
+                          </TableHead>
+
+                          <TableHead className="font-bold text-primary py-3 px-4">
+                            Contact No.
+                          </TableHead>
+
+                        </tr>
+                      </TableHeader>
+
+                      <TableBody>
+                        {student.sponsors?.map((sponsor) => (
+                          <TableRow
+                            key={sponsor._id}
+                            className="hover:bg-primary/10"
+                          >
+                            <TableCell className="font-medium">
+                              {sponsor.name}
+                            </TableCell>
+
+                            <TableCell>
+                              {sponsor.email}
+                            </TableCell>
+
+                            <TableCell>
+                              {sponsor.contactNumber || "N/A"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </div>
-
-              <div className="flex justify-end mt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => toggleExpand(student._id)}
-                  className="gap-2"
-                >
-                  {expanded === student._id ? (
-                    <>
-                      Hide Sponsors
-                      <ChevronUp className="w-4 h-4" />
-                    </>
-                  ) : (
-                    <>
-                      View Sponsors
-                      <ChevronDown className="w-4 h-4" />
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {expanded === student._id && (
-                <div className="mt-6 border-t border-border pt-6">
-                  <Table className="text-sm">
-                    <TableHeader>
-                      <tr className="bg-gradient-to-r from-primary/10 to-primary/5 border-b-2 border-primary/30">
-                        <TableHead className="font-bold text-primary py-3 px-4">
-                          Name
-                        </TableHead>
-
-                        <TableHead className="font-bold text-primary py-3 px-4">
-                          Email
-                        </TableHead>
-
-                        <TableHead className="font-bold text-primary py-3 px-4">
-                          Contact No.
-                        </TableHead>
-
-                      </tr>
-                    </TableHeader>
-
-                    <TableBody>
-                      {student.sponsors?.map((sponsor) => (
-                        <TableRow
-                          key={sponsor._id}
-                          className="hover:bg-primary/10"
-                        >
-                          <TableCell className="font-medium">
-                            {sponsor.name}
-                          </TableCell>
-
-                          <TableCell>
-                            {sponsor.email}
-                          </TableCell>
-
-                          <TableCell>
-                            {sponsor.contactNumber || "N/A"}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </div>
-          ))
-        )}
+            ))
+          )}
       </div>
     </div>
   );
