@@ -159,23 +159,22 @@ export default function SponsorshipHistory() {
       <div className="h-6" />
 
       <div className="flex flex-wrap justify-center items-center gap-4 mt-10 mb-8 px-10">
-        {sessions.length === 0 ? (
-          <div className="text-center py-20">
-            There are no sponsored students for this session.
-          </div>
-        ) : (
-          <select
-            value={selectedSession}
-            onChange={(e) => setSelectedSession(e.target.value)}
-            className="border border-border rounded-lg px-4 py-2 bg-background"
-          >
-            {sessions.map((session) => (
+        <select
+          value={selectedSession}
+          onChange={(e) => setSelectedSession(e.target.value)}
+          className="border border-border rounded-lg px-4 py-2 bg-background"
+          disabled={sessions.length === 0}
+        >
+          {sessions.length === 0 ? (
+            <option value="">No sessions available</option>
+          ) : (
+            sessions.map((session) => (
               <option key={session} value={session}>
                 {session}
               </option>
-            ))}
-          </select>
-        )}
+            ))
+          )}
+        </select>
 
         <div className="relative w-full max-w-xl">
           <Input

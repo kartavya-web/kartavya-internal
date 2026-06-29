@@ -88,51 +88,54 @@ const getUserById = async (req, res) => {
 // GET /api/users/sponsors  -> returns sponsors populated with students
 const getAllSponsors = async (req, res) => {
   try {
-    const Student = require("../models/Student");
-    const sponsors = await User.find()
-      .select(
-        "_id name email contactNumber dateOfBirth gender currentJob totalDonation profileImage"
-      )
-      .lean();
+    const User = require("../models/User");
 
-    const students = await Student.find(
-      { sponsorId: { $ne: null } },
-      "studentName rollNumber class centre school profilePhoto sponsorshipStatus sponsorId"
-    ).lean();
-
-    const sponsorMap = new Map();
-
-    for (const student of students) {
-      const id = student.sponsorId.toString();
-
-      if (!sponsorMap.has(id)) {
-        sponsorMap.set(id, []);
+    const sortedSponsors = await User.aggregate([
+      // Step 1: Join with the students collection
+      {
+        $lookup: {
+          from: "students", 
+          localField: "_id",
+          foreignField: "sponsorId",
+          as: "sponsoredStudents"
+        }
+      },
+      {
+        $addFields: {
+          studentCount: { $size: "$sponsoredStudents" }
+        }
+      },
+      {
+        $sort: { studentCount: -1 }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          email: 1,
+          contactNumber: 1,
+          dateOfBirth: 1,
+          gender: 1,
+          currentJob: 1,
+          totalDonation: 1,
+          profileImage: 1,
+          studentCount: 1,
+          "sponsoredStudents._id": 1,
+          "sponsoredStudents.studentName": 1,
+          "sponsoredStudents.rollNumber": 1,
+          "sponsoredStudents.class": 1,
+          "sponsoredStudents.centre": 1,
+          "sponsoredStudents.school": 1,
+          "sponsoredStudents.profilePhoto": 1,
+          "sponsoredStudents.sponsorshipStatus": 1
+        }
       }
+    ]);
 
-      sponsorMap.get(id).push(student);
-    }
-
-    const sponsorsWithCounts = sponsors.map((sponsor) => {
-      const sponsoredStudents =
-        sponsorMap.get(sponsor._id.toString()) || [];
-
-      return {
-        ...sponsor,
-        sponsoredStudents,
-        studentCount: sponsoredStudents.length,
-      };
-    });
-
-    sponsorsWithCounts.sort(
-      (a, b) => b.studentCount - a.studentCount
-    );
-
-    res.status(200).json(sponsorsWithCounts);
+    console.log('Found sponsors count:', sortedSponsors.length);
+    res.status(200).json(sortedSponsors);
   } catch (err) {
-    res.status(500).json({
-      message: "Server error",
-      error: err.message,
-    });
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
