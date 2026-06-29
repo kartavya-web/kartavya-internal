@@ -88,42 +88,51 @@ const getUserById = async (req, res) => {
 // GET /api/users/sponsors  -> returns sponsors populated with students
 const getAllSponsors = async (req, res) => {
   try {
-    console.log('Getting all sponsors...');
     const Student = require("../models/Student");
-
-    // Fetch all users who could be sponsors
     const sponsors = await User.find()
-      .select('_id name email contactNumber dateOfBirth gender currentJob totalDonation profileImage')
+      .select(
+        "_id name email contactNumber dateOfBirth gender currentJob totalDonation profileImage"
+      )
       .lean();
 
-    // For each sponsor, query the Student collection directly for the source of truth
-    const sponsorsWithCounts = await Promise.all(
-      sponsors.map(async (sponsor) => {
-        const [studentCount, sponsoredStudents] = await Promise.all([
-          Student.countDocuments({ sponsorId: sponsor._id }),
-          Student.find(
-            { sponsorId: sponsor._id },
-            "studentName rollNumber class centre school profilePhoto sponsorshipStatus"
-          ).lean()
-        ]);
+    const students = await Student.find(
+      { sponsorId: { $ne: null } },
+      "studentName rollNumber class centre school profilePhoto sponsorshipStatus sponsorId"
+    ).lean();
 
-        return {
-          ...sponsor,
-          sponsoredStudents,
-          studentCount
-        };
-      })
+    const sponsorMap = new Map();
+
+    for (const student of students) {
+      const id = student.sponsorId.toString();
+
+      if (!sponsorMap.has(id)) {
+        sponsorMap.set(id, []);
+      }
+
+      sponsorMap.get(id).push(student);
+    }
+
+    const sponsorsWithCounts = sponsors.map((sponsor) => {
+      const sponsoredStudents =
+        sponsorMap.get(sponsor._id.toString()) || [];
+
+      return {
+        ...sponsor,
+        sponsoredStudents,
+        studentCount: sponsoredStudents.length,
+      };
+    });
+
+    sponsorsWithCounts.sort(
+      (a, b) => b.studentCount - a.studentCount
     );
 
-    // Sort sponsors by number of sponsored students in descending order
-    const sortedSponsors = sponsorsWithCounts.sort((a, b) =>
-      (b.studentCount || 0) - (a.studentCount || 0)
-    );
-
-    console.log('Found sponsors count:', sortedSponsors.length);
-    res.status(200).json(sortedSponsors);
+    res.status(200).json(sponsorsWithCounts);
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({
+      message: "Server error",
+      error: err.message,
+    });
   }
 };
 
