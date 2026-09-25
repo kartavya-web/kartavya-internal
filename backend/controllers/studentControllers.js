@@ -4,6 +4,63 @@ const azure = require("../azureStorage");
 const asyncHandler = require("express-async-handler");
 const { get } = require("https");
 const { get: httpGet } = require("http");
+const { sendEmail } = require("../Utils/mailer");
+const generateEmailTemplate = require("../Utils/mailTemplate");
+
+/**
+ * Sends marksheet notification emails to all sponsors of a student.
+ * This runs asynchronously and does not block the API response.
+ */
+const sendMarksheetEmailToSponsors = async (student, session, resultUrl) => {
+  try {
+    if (!student.sponsorId || student.sponsorId.length === 0) {
+      console.log(`No sponsors found for student ${student.studentName} (${student.rollNumber}). Skipping email.`);
+      return;
+    }
+
+    const sponsors = await User.find(
+      { _id: { $in: student.sponsorId } },
+      { name: 1, email: 1 }
+    ).lean();
+
+    if (!sponsors || sponsors.length === 0) {
+      console.log(`No sponsor records found for student ${student.studentName}. Skipping email.`);
+      return;
+    }
+
+    for (const sponsor of sponsors) {
+      try {
+        const emailTemplate = generateEmailTemplate({
+          title: "New Result Uploaded - Kartavya IIT(ISM)",
+          message: `Hello ${sponsor.name},<br><br>We are pleased to inform you that a new result has been uploaded for your sponsored child <strong>${student.studentName}</strong> (Roll No: ${student.rollNumber}) for the session <strong>${session}</strong>.`,
+          highlightBox: true,
+          highlightContent: `Result for Session: ${session}`,
+          buttonLink: resultUrl,
+          buttonText: "View Result",
+          additionalContent: `
+            <p>You can view and download the result by clicking the button above.</p>
+            <p>You can also view the result from your dashboard by clicking on the student profile on our website.</p>
+            <p>We truly appreciate your continued support towards the education of underprivileged children. Your sponsorship makes a real difference in their lives.</p>
+            <p>If you have any questions, feel free to reach out to our team.</p>
+          `,
+        });
+
+        await sendEmail({
+          to: sponsor.email,
+          subject: `Kartavya - New Result Uploaded for ${student.studentName} (Session: ${session})`,
+          html: emailTemplate,
+          text: `Hello ${sponsor.name},\n\nA new result has been uploaded for your sponsored child ${student.studentName} (Roll No: ${student.rollNumber}) for the session ${session}.\n\nYou can view the result here: ${resultUrl}\n\nThank you for supporting education through Kartavya.`,
+        });
+
+        console.log(`Result email sent to sponsor ${sponsor.name} (${sponsor.email}) for student ${student.studentName}`);
+      } catch (emailError) {
+        console.error(`Failed to send result email to ${sponsor.email}:`, emailError);
+      }
+    }
+  } catch (error) {
+    console.error("Error in sendMarksheetEmailToSponsors:", error);
+  }
+};
 
 // @route POST /Students
 const addNewStudent = asyncHandler(async (req, res, profilePictureUrl) => {
@@ -307,6 +364,11 @@ const updateResult = asyncHandler(async (req, res, resultUrl) => {
     }
 
     await student.save();
+
+    // Send marksheet notification emails to sponsors (fire-and-forget)
+    sendMarksheetEmailToSponsors(student, session, resultUrl).catch((err) =>
+      console.error("Background marksheet email failed:", err)
+    );
 
     res.status(200).json({
       message: `Result for "${session}" of ${student.studentName} updated successfully.`,

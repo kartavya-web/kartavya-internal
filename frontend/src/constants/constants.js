@@ -1,5 +1,9 @@
 export const Classes = [
   {
+    value: "LR",
+    label: "LR",
+  },
+  {
     value: "LKG",
     label: "LKG",
   },
@@ -97,6 +101,7 @@ export const Schools = [
   { label: "ISL Jharia", value: "ISL Jharia" },
   { label: "St. Xavier", value: "St. Xavier" },
   { label: "Middle School Dhaiya", value: "Middle School Dhaiya" },
+  { label: "BSS Mahila Mahavidyalaya", value: "BSS Mahila Mahavidyalaya" },
 ];
 
 export const ActiveStatus = [

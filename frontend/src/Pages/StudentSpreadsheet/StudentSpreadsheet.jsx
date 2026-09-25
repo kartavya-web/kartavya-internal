@@ -77,6 +77,12 @@ const StudentSpreadsheet = () => {
     });
   };
 
+  // Normalize class values so "L.K.G" matches "LKG", "U.K.G" matches "UKG", etc.
+  const normalizeClassValue = (val) => {
+    if (typeof val !== "string") return val;
+    return val.replace(/\./g, "").trim().toUpperCase();
+  };
+
   const filterData = () => {
     return students?.filter((student) => {
       for (const filterKey in filters) {
@@ -89,8 +95,17 @@ const StudentSpreadsheet = () => {
             ? false
             : student[filterKey];
 
-        if (!activeFilterValues.includes(studentValue)) {
-          return false;
+        // For class filter, normalize both sides to handle "L.K.G" vs "LKG" etc.
+        if (filterKey === "class") {
+          const normalizedStudentVal = normalizeClassValue(studentValue);
+          const normalizedFilterVals = activeFilterValues.map(normalizeClassValue);
+          if (!normalizedFilterVals.includes(normalizedStudentVal)) {
+            return false;
+          }
+        } else {
+          if (!activeFilterValues.includes(studentValue)) {
+            return false;
+          }
         }
 
       }
