@@ -64,13 +64,36 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+  }
+  #root {
+    min-height: 100vh;
+    width: 100%;
   }
 }
 
 @layer base {
   img {
-    display: initial;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .Toastify__toast-container {
+    left: auto;
+    right: 0.5rem;
+    width: min(320px, calc(100vw - 1rem));
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 }

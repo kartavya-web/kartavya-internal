@@ -175,8 +175,8 @@ const StudentProfile = () => {
   }
 
   return (
-    <div className="flex select-none">
-      <div className="sticky top-0 flex flex-col gap-10 sidebar w-[21%] h-screen pl-[10px] pr-[10px] border-r border-r-[#DDE4EB]">
+    <div className="flex min-h-screen flex-col select-none lg:flex-row">
+      <div className="sidebar flex w-full flex-col gap-5 border-b border-r-[#DDE4EB] px-3 py-4 sm:px-5 lg:sticky lg:top-0 lg:h-screen lg:w-[21%] lg:gap-10 lg:overflow-y-auto lg:border-b-0 lg:border-r lg:px-[10px]">
         <Link to="/">
           <div className="logo w-full">
             <img src="/logos.png" alt="logos" className="object-contain" />
@@ -185,7 +185,7 @@ const StudentProfile = () => {
 
         <div className="basic-details">
           <div className="filters flex flex-col items-center p-[10px]">
-            <div className="profile-photo h-[270px] w-[220px] bg-cover rounded-lg border overflow-hidden">
+            <div className="profile-photo h-56 w-44 max-w-full bg-cover rounded-lg border overflow-hidden sm:h-[270px] sm:w-[220px]">
               <img
                 src={studentData?.profilePhoto || "/student.jpg"}
                 alt="profile-photo"
@@ -201,21 +201,21 @@ const StudentProfile = () => {
             <div className="label text-xl font-bold text-primary mb-4">
               Basic Details
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3">
               <div className="font-semibold text-gray-700">Name:</div>
-              <div className="col-span-2">{studentData?.studentName}</div>
+              <div>{studentData?.studentName}</div>
 
               <div className="font-semibold text-gray-700">Roll No.:</div>
-              <div className="col-span-2">{studentData?.rollNumber}</div>
+              <div>{studentData?.rollNumber}</div>
 
               <div className="font-semibold text-gray-700">Class:</div>
-              <div className="col-span-2">{studentData?.class}</div>
+              <div>{studentData?.class}</div>
 
               <div className="font-semibold text-gray-700">Center:</div>
-              <div className="col-span-2">{studentData?.centre}</div>
+              <div>{studentData?.centre}</div>
 
               <div className="font-semibold text-gray-700">Status:</div>
-              <div className="col-span-2">
+              <div>
                 <select
                   id={"activeStatus"}
                   name={"activeStatus"}
@@ -234,8 +234,8 @@ const StudentProfile = () => {
           </div>
         </div>
       </div>
-      <div className="hero flex flex-col w-[80%]  bg-fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(222,80,85,0.4),transparent),radial-gradient(ellipse_at_top_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_top_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0))]">
-        <div className="heading text-3xl font-semibold text-center pt-5 pb-5 border-b w-full">
+      <div className="hero flex w-full min-w-0 flex-col bg-fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(222,80,85,0.4),transparent),radial-gradient(ellipse_at_top_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_top_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0))] lg:w-[80%]">
+        <div className="heading w-full border-b px-3 py-4 text-center text-2xl font-semibold sm:py-5 sm:text-3xl">
           Student Profile
         </div>
 
@@ -243,8 +243,8 @@ const StudentProfile = () => {
 
         {/* General Details */}
 
-        <div className="general-details w-[90%] m-auto mt-10">
-          <div className="w-full flex justify-between text-2xl h-10 font-semibold text-primary">
+        <div className="general-details m-auto mt-6 w-[94%] sm:mt-10 sm:w-[90%]">
+          <div className="flex h-auto w-full flex-wrap items-center justify-between gap-3 text-xl font-semibold text-primary sm:text-2xl">
             General Details
             {studentDataChanged && (
               <Button onClick={handleSaveChanges}>
@@ -260,7 +260,7 @@ const StudentProfile = () => {
 
         {/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
 
-        <div className="flex w-[90%] m-auto mt-20">
+        <div className="m-auto mt-12 flex w-[94%] flex-col gap-10 sm:w-[90%] lg:mt-20 lg:flex-row">
           {/* Document Details */}
           <div className="document-details flex flex-col w-full gap-[1.55rem]">
             <div className="w-full text-2xl font-semibold text-primary mb-5">
@@ -466,10 +466,10 @@ const StudentProfile = () => {
               )}
             </div>
 
-            <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%] ">
+            <div className="flex min-h-9 w-full flex-wrap items-center gap-2 px-[2.5%] py-1">
               <label
                 htmlFor="isSponsored"
-                className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="w-full font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 sm:w-[60%]"
               >
                 Do we sponsor this student?
               </label>
@@ -491,11 +491,11 @@ const StudentProfile = () => {
               </span>
             </div>
 
-            <div className="annual-school-fees flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
-              <label className="w-[60%] font-semibold">
+            <div className="annual-school-fees flex min-h-9 w-full flex-wrap items-center gap-2 px-[2.5%] py-1">
+              <label className="w-full font-semibold sm:w-[60%]">
                 Annual School Fees
               </label>
-              <div className="w-[200px]">
+              <div className="w-full sm:w-[200px]">
                 <Input
                   type="number"
                   name="annualFees"
@@ -507,14 +507,14 @@ const StudentProfile = () => {
               </div>
             </div>
 
-            <div className="flex items-center w-full h-9 pl-[2.5%] pr-[2.5%]">
+            <div className="flex min-h-9 w-full flex-wrap items-center gap-2 px-[2.5%] py-1">
               <label
                 htmlFor="payTotalFees"
-                className="w-[60%] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="w-full font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 sm:w-[60%]"
               >
                 Sponsorship Percentage
               </label>
-              <div className="w-[200px]">
+              <div className="w-full sm:w-[200px]">
                 <Input
                   type="number"
                   name="sponsorshipPercent"
@@ -530,7 +530,7 @@ const StudentProfile = () => {
         {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
         {/* Result Details */}
 
-        <div className="result-details w-[90%] m-auto mt-20">
+        <div className="result-details m-auto mt-12 w-[94%] sm:w-[90%] lg:mt-20">
           <Result studentData={studentData} />
         </div>
 
@@ -560,7 +560,7 @@ const StudentProfile = () => {
 
         {/* comment section */}
 
-        <div className="result-details w-[90%] m-auto mt-20">
+        <div className="result-details m-auto mt-12 w-[94%] sm:w-[90%] lg:mt-20">
           <div className="w-full flex justify-between text-2xl font-semibold text-primary mb-5">
             Remarks about student
           </div>
@@ -575,8 +575,8 @@ const StudentProfile = () => {
         </div>
 
         {/* Download Profile option */}
-        <div className="download-profile w-[90%] m-auto mt-32">
-          <div className="w-full flex justify-center gap-5 text-2xl font-semibold text-primary mb-5">
+        <div className="download-profile m-auto mb-8 mt-16 w-[94%] sm:w-[90%] lg:mt-32">
+          <div className="flex w-full flex-wrap justify-center gap-3 text-xl font-semibold text-primary mb-5 sm:gap-5 sm:text-2xl">
             <DialogForPdfPreview studentData={studentData} />
             {studentDataChanged && (
               <Button onClick={handleSaveChanges}>

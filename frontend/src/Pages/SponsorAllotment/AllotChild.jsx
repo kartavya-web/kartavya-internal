@@ -120,21 +120,21 @@ const AllotChild = () => {
   }
 
   return (
-    <div className="px-10">
+    <div className="px-4 sm:px-6 lg:px-10">
       <Link to="/allotment">
         <Button className="mt-5"><ArrowLeft></ArrowLeft></Button>
       </Link>
-      <div className="text-3xl font-semibold text-center">
+      <div className="text-center text-2xl font-semibold sm:text-3xl">
         Child Allotment Page
       </div>
       <div className="pt-10">
-        <div className="flex justify-center gap-[200px]">
-          <div className="sponsor w-[20%] flex flex-col gap-5 border p-2 rounded-lg text-lg text-center font-semibold">
+        <div className="flex flex-col items-stretch justify-center gap-4 md:flex-row md:items-center md:gap-6 xl:gap-12">
+          <div className="sponsor flex flex-col gap-3 rounded-lg border p-3 text-center text-base font-semibold md:w-1/3 md:text-lg">
             <div className="text-sm text-muted-foreground">Sponsor</div>
             <div>{sponsorName}</div>
           </div>
 
-          <div className="child w-[20%] flex flex-col gap-5 border p-2 rounded-lg text-lg text-center font-semibold">
+          <div className="child flex flex-col gap-3 rounded-lg border p-3 text-center text-base font-semibold md:w-1/3 md:text-lg">
             <div className="text-sm text-muted-foreground">Child</div>
             {selectedChild ? (
               <div className="capitalize">{selectedChild.studentName}</div>
@@ -145,18 +145,18 @@ const AllotChild = () => {
             )}
           </div>
 
-          <div className="allot-button flex justify-center items-center">
+          <div className="allot-button flex items-center justify-center md:w-1/3">
             <Button onClick={handleChildAllotment}>Allot Child</Button>
           </div>
         </div>
 
-        <div className="flex justify-between w-full mt-10">
+        <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Input
             type="text"
             placeholder="Search by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="rounded-lg p-2 w-[20%] text-sm "
+            className="w-full rounded-lg p-2 text-sm sm:max-w-sm"
           />
           <div> Remaining Students : {childTobeAlloted.length}</div>
         </div>

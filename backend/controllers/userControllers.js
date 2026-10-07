@@ -88,51 +88,21 @@ const getUserById = async (req, res) => {
 // GET /api/users/sponsors  -> returns sponsors populated with students
 const getAllSponsors = async (req, res) => {
   try {
-    const User = require("../models/User");
-
-    const sortedSponsors = await User.aggregate([
-      // Step 1: Join with the students collection
-      {
-        $lookup: {
-          from: "students", 
-          localField: "_id",
-          foreignField: "sponsorId",
-          as: "sponsoredStudents"
-        }
-      },
-      {
-        $addFields: {
-          studentCount: { $size: "$sponsoredStudents" }
-        }
-      },
-      {
-        $sort: { studentCount: -1 }
-      },
-      {
-        $project: {
-          _id: 1,
-          name: 1,
-          email: 1,
-          contactNumber: 1,
-          dateOfBirth: 1,
-          gender: 1,
-          currentJob: 1,
-          totalDonation: 1,
-          profileImage: 1,
-          studentCount: 1,
-          "sponsoredStudents._id": 1,
-          "sponsoredStudents.studentName": 1,
-          "sponsoredStudents.rollNumber": 1,
-          "sponsoredStudents.class": 1,
-          "sponsoredStudents.centre": 1,
-          "sponsoredStudents.school": 1,
-          "sponsoredStudents.profilePhoto": 1,
-          "sponsoredStudents.sponsorshipStatus": 1
-        }
-      }
-    ]);
-
-    console.log('Found sponsors count:', sortedSponsors.length);
+    console.log('Getting all sponsors...');
+    const sponsors = await User.find()
+      .populate({
+        path: "sponsoredStudents",
+        select: "studentName rollNumber class centre school profilePhoto sponsorshipStatus"
+      })
+      .select('name email contactNumber dateOfBirth gender currentJob totalDonation sponsoredStudents profileImage')
+      .lean();
+    
+    // Sort sponsors by number of sponsored students in descending order
+    const sortedSponsors = sponsors.sort((a, b) => 
+      (b.sponsoredStudents?.length || 0) - (a.sponsoredStudents?.length || 0)
+    );
+    
+    console.log('Found sponsors:', sortedSponsors);
     res.status(200).json(sortedSponsors);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });

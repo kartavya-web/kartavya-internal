@@ -34,25 +34,25 @@ const SpreadsheetBody = ({ studentData }) => {
   };
 
   return (
-    <div className="relative flex flex-col justify-center items-center gap-10">
-      <div className="w-full h-auto sticky top-0 border-b bg-white z-[100]">
-        <div className="heading relative w-full flex justify-center text-3xl font-bold text-center py-5">
+    <div className="relative flex min-w-0 flex-col items-center justify-center gap-6 sm:gap-10">
+      <div className="sticky top-0 z-[100] h-auto w-full border-b bg-white">
+        <div className="heading relative flex w-full flex-col items-center justify-center gap-3 px-3 py-4 text-center text-xl font-bold sm:px-5 sm:text-2xl lg:flex-row lg:gap-0 lg:py-5 lg:text-3xl">
           Student Details Spreadsheet
           <Button
             onClick={handleLogout}
             varient="outline"
-            className="absolute right-10"
+            className="mt-0 px-4 lg:absolute lg:right-10 lg:mt-0"
           >
             Log Out
           </Button>
         </div>
-        <div className="w-full flex justify-between px-10 py-5">
+        <div className="flex w-full flex-col gap-3 px-3 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-6 lg:px-10">
           <Input
             type="text"
             placeholder="Search for student with name"
             value={searchQuery}
             onChange={handleInputChange}
-            className="rounded-lg p-2 w-[30%]"
+            className="w-full rounded-lg p-2 sm:w-[min(30%,24rem)]"
           />
           <div>
             {" "}
@@ -68,7 +68,7 @@ const SpreadsheetBody = ({ studentData }) => {
           </div>
         </div>
       </div>
-      <div className="w-full flex justify-center items-center">
+      <div className="w-full min-w-0 overflow-x-auto flex justify-center items-center">
         <StudentTable filteredStudents={studentsSearchedByName} />
       </div>
     </div>
