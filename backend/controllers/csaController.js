@@ -9,7 +9,60 @@ const ExcelJS = require("exceljs");
 
 // @route GET/api/allotment/
 const getVerifiedDonations = asyncHandler(async (req, res) => {
-  const verifiedDonations = await ChildSponsorMap.find({}).lean();
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  const currentAcademicYear =
+    month >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+
+  const users = await User.find()
+    .populate({
+      path: "donations",
+      match: {
+        verified: true,
+        rejected: false,
+        academicYear: currentAcademicYear,
+      },
+      select: "donationDate numChild amount academicYear",
+      options: {
+        sort: { donationDate: -1 },
+      },
+    })
+    .select("name email contactNumber sponsoredStudents donations")
+    .lean();
+
+  const verifiedDonations = users
+    .filter((user) => user.donations && user.donations.length > 0)
+    .map((user) => {
+      const totalNumChild = user.donations.reduce(
+        (sum, d) => sum + (d.numChild || 0),
+        0
+      );
+
+      const currentSponsored = user.sponsoredStudents
+        ? user.sponsoredStudents.length
+        : 0;
+
+      const pendingAllotment = totalNumChild - currentSponsored;
+
+      // Latest verified donation date
+      const latestDonationDate = user.donations[0]?.donationDate || null;
+
+      return {
+        user: user._id,
+        name: user.name || "",
+        email: user.email || "",
+        contactNumber: user.contactNumber || "",
+        totalNumChild,
+        currentSponsored,
+        pendingAllotment,
+        latestDonationDate,
+        academicYear: currentAcademicYear,
+      };
+    })
+    .filter((entry) => entry.pendingAllotment > 0);
+
   res.json(verifiedDonations);
 });
 

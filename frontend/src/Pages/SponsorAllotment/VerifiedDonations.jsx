@@ -108,23 +108,12 @@ export default function VerifiedDonations() {
         if (!response.ok) throw new Error("Failed to fetch verified donations");
 
         const data = await response.json();
+        console.log("Verified Donations Data:", data);
 
-        // Sorting donations within each sponsor by date
-        const sortedData = data
-          .map((sponsor) => ({
-            ...sponsor,
-            donations: sponsor.donations.sort(
-              (a, b) => new Date(a.date) - new Date(b.date)
-            ),
-          }))
-          // Sorting sponsors based on their earliest donation
-          .sort((a, b) => {
-            const firstDonationA =
-              a.donations.length > 0 ? new Date(a.donations[0].date) : Infinity;
-            const firstDonationB =
-              b.donations.length > 0 ? new Date(b.donations[0].date) : Infinity;
-            return firstDonationA - firstDonationB;
-          });
+        // Sort by highest pending allotment first
+        const sortedData = data.sort(
+          (a, b) => b.pendingAllotment - a.pendingAllotment
+        );
 
         setVerifiedDonations(sortedData);
       } catch (error) {
@@ -161,7 +150,7 @@ export default function VerifiedDonations() {
   }
   return (
     <div className="flex flex-col items-center space-y-10 p-10 w-full">
-      {verifiedDonations?.map((sponsor, index1) => (<div
+      {verifiedDonations?.map((sponsor) => (<div
         key={sponsor.user}
         className="w-11/12 max-w-5xl border rounded-2xl shadow-md overflow-hidden"
       >
@@ -173,44 +162,65 @@ export default function VerifiedDonations() {
         <Table className="w-full">
           <TableHeader>
             <TableRow className="bg-gray-200 hover:!bg-gray-200">
-              <TableHead className="w-1/2 text-gray-700 text-base font-semibold text-left pl-6 py-3">
-                Date
+              <TableHead className="w-1/5 text-gray-700 text-base font-semibold text-left pl-6 py-3">
+                Latest Donation Date
               </TableHead>
-              <TableHead className="w-1/4 text-gray-700 text-base font-semibold py-3">
-                No of Children
+
+              <TableHead className="w-1/5 text-gray-700 text-base font-semibold py-3">
+                Should Sponsor
               </TableHead>
-              <TableHead className="w-1/4 text-gray-700 text-base font-semibold text-right pr-6 py-3">
+
+              <TableHead className="w-1/5 text-gray-700 text-base font-semibold py-3">
+                Currently Sponsored
+              </TableHead>
+
+              <TableHead className="w-1/5 text-gray-700 text-base font-semibold py-3">
+                Pending Allotment
+              </TableHead>
+
+              <TableHead className="w-1/5 text-gray-700 text-base font-semibold text-right pr-6 py-3">
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {sponsor?.donations?.map((donation, index2) => (
-              <TableRow
-                key={donation.donationId}
-                className="hover:bg-gray-50 transition"
-              >
-                <TableCell className="pl-6 text-gray-900 text-base font-medium py-3">
-                  {new Date(donation.date)
-                    .toLocaleDateString("en-GB")
-                    .replace(/\//g, "-")}
-                </TableCell>
-                <TableCell className="text-gray-900 text-base font-medium py-3">
-                  {donation.numChild}
-                </TableCell>
-                <TableCell className="pr-6 text-right py-3">
-                  {index1 === 0 && index2 === 0 && (
-                    <Button
-                      onClick={() => handleClick(sponsor.user, sponsor.name)}
-                      className="h-8 bg-[#025f43] hover:bg-[#1a604a] text-white px-5 py-1 rounded-lg text-base font-medium transition"
-                    >
-                      Allot Child
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+            <TableRow className="hover:bg-gray-50 transition">
+              <TableCell className="pl-6 text-gray-900 text-base font-medium py-3">
+                {sponsor.latestDonationDate
+                  ? new Date(sponsor.latestDonationDate).toLocaleDateString(
+                    "en-IN",
+                    {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      timeZone: "Asia/Kolkata",
+                    }
+                  )
+                  : "N/A"}
+              </TableCell>
+
+              <TableCell className="text-gray-900 text-base font-medium py-3">
+                {sponsor.totalNumChild}
+              </TableCell>
+
+              <TableCell className="text-gray-900 text-base font-medium py-3">
+                {sponsor.currentSponsored}
+              </TableCell>
+
+              <TableCell className="text-gray-900 text-base font-medium py-3">
+                {sponsor.pendingAllotment}
+              </TableCell>
+
+              <TableCell className="pr-6 text-right py-3">
+                <Button
+                  onClick={() => handleClick(sponsor.user, sponsor.name)}
+                  className="h-8 bg-[#025f43] hover:bg-[#1a604a] text-white px-5 py-1 rounded-lg text-base font-medium transition"
+                >
+                  Allot Child
+                </Button>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </div>
