@@ -18,10 +18,10 @@ const AllotmentHomePage = () => {
       <Link to="/">
         <Button className="m-5"><Home></Home> HomePage</Button>
       </Link>
-      <div className="header text-3xl font-semibold text-center mt-5">
+      <div className="header mt-5 px-3 text-center text-2xl font-semibold sm:text-3xl">
         Verified Donations
       </div>
-      <div className="tables mx-10">
+      <div className="tables mx-2 sm:mx-5 lg:mx-10">
         <VerifiedDonations />
       </div>
     </div>

@@ -42,11 +42,11 @@ const AvailableStudents = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">Students Available for Allotment</h1>
-          <Button onClick={() => navigate("/")} variant="outline">
+        <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-3xl font-bold text-gray-800 sm:text-4xl">Students Available for Allotment</h1>
+          <Button className="w-full sm:w-auto" onClick={() => navigate("/")} variant="outline">
             Back to Dashboard
           </Button>
         </div>

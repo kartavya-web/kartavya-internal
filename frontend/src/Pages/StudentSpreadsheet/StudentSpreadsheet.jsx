@@ -116,15 +116,15 @@ const StudentSpreadsheet = () => {
   if (loading) return <Loader />;
 
   return (
-    <div className="flex select-none overflow-hidden relative">
-      <div className="w-[21%] h-screen flex flex-col gap-10 sticky top-0 overflow-y-auto pl-[10px] pr-[10px] border-r border-r-[#DDE4EB]">
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden select-none lg:flex-row">
+      <div className="flex w-full flex-col gap-6 border-b border-r-[#DDE4EB] px-3 py-4 sm:px-5 lg:sticky lg:top-0 lg:h-screen lg:w-[21%] lg:gap-10 lg:overflow-y-auto lg:border-b-0 lg:border-r lg:px-[10px]">
         <div className="logo w-full">
-          <img src="/logos.png" alt="logos" className="object-contain h-4/5" />
+          <img src="/logos.png" alt="logos" className="mx-auto h-16 object-contain lg:h-4/5" />
         </div>
 
-        <div className="h-full flex flex-col justify-between">
-          <div className="filters flex flex-col items-center gap-5">
-            <div className="text-3xl font-semibold text-center">Filters</div>
+        <div className="flex flex-col justify-between gap-6 lg:h-full">
+          <div className="filters flex flex-col items-center gap-4">
+            <div className="text-2xl font-semibold text-center lg:text-3xl">Filters</div>
 
             <FilterComponent
               filterLable={"Class"}
@@ -185,8 +185,8 @@ const StudentSpreadsheet = () => {
           </form> */}
           </div>
 
-          <div className="filters flex flex-col items-center gap-5 mb-12">
-            <div className="text-3xl font-semibold text-center">
+          <div className="filters flex flex-col items-center gap-3 lg:mb-12">
+            <div className="text-2xl font-semibold text-center lg:text-3xl">
               Add Student
             </div>
             <Button onClick={() => navigate("/enter-student-details")}>
@@ -195,7 +195,7 @@ const StudentSpreadsheet = () => {
           </div>
         </div>
       </div>
-      <div className="hero w-[80%] h-screen overflow-y-auto">
+      <div className="hero min-w-0 w-full overflow-x-auto lg:h-screen lg:w-[80%] lg:overflow-y-auto">
         <SpreadsheetBody studentData={filteredData} />
       </div>
     </div>

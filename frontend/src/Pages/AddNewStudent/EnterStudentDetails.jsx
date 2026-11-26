@@ -113,10 +113,10 @@ const EnterStudentDetails = () => {
   };
 
   return (
-    <div className="w-screen h-screen overflow-x-hidden bg-[radial-gradient(ellipse_at_center,rgba(222,80,85,0.4),transparent),radial-gradient(ellipse_at_top_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_top_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0))]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[radial-gradient(ellipse_at_center,rgba(222,80,85,0.4),transparent),radial-gradient(ellipse_at_top_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_top_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_left,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0)),radial-gradient(ellipse_at_bottom_right,rgba(205,214,219,0.8),rgba(255,255,255,0.8),rgba(255,255,255,0))] xl:h-screen">
       <HeaderForInputStudentDetails />
-      <div className="flex flex-col w-full xl:flex-row xl:h-[calc(100vh-7rem)]">
-        <div className="flex justify-center items-center w-full h-[500px] xl:w-2/5 xl:h-full">
+      <div className="flex w-full flex-col xl:h-[calc(100vh-7rem)] xl:flex-row">
+        <div className="flex h-[min(55vh,500px)] w-full items-center justify-center xl:h-full xl:w-2/5">
           <img
             src="/students-image.jpg"
             alt="students-image"
@@ -124,7 +124,7 @@ const EnterStudentDetails = () => {
           />
         </div>
 
-        <div className="relative w-full overflow-hidden xl:w-3/5 xl:h-full">
+        <div className="relative min-h-[700px] w-full overflow-hidden xl:h-full xl:min-h-0 xl:w-3/5">
           <div
             className={`transition-transform duration-500 ease-in-out absolute inset-0 overflow-hidden ${
               isFirstPage ? "translate-x-0" : "-translate-x-full"
@@ -170,8 +170,8 @@ const EnterStudentDetails = () => {
                 />
               </div>
 
-              <div className="inputs flex flex-col items-end w-full pt-20 pr-10 gap-5">
-                <div className="file-input w-full  flex justify-between">
+              <div className="inputs flex w-full flex-col items-stretch gap-5 px-4 pt-10 sm:items-end sm:px-10 sm:pt-20">
+                <div className="file-input flex w-full flex-col gap-3 sm:flex-row sm:justify-between">
                   <label htmlFor="fileInput" className="text-sm font-semibold">
                     Upload passport size picture of student
                   </label>
@@ -189,7 +189,7 @@ const EnterStudentDetails = () => {
                 </div>
               </div>
 
-              <div className="documents flex flex-col w-full mt-20">
+              <div className="documents mt-12 flex w-full flex-col px-4 sm:mt-20 sm:px-0">
                 <div className="text-sm font-semibold mb-6">
                   Document details of student
                 </div>
@@ -209,7 +209,7 @@ const EnterStudentDetails = () => {
               </div>
 
               <div className="flex items-center w-full py-10">
-                <div className="flex justify-center w-[90%] pl-[2.5%] pr-[2.5%] gap-10">
+                <div className="flex w-[90%] justify-center gap-3 px-[2.5%] sm:gap-10">
                   <Button
                     onClick={handleClick}
                     className="w-[150px] p-2 rounded-lg"

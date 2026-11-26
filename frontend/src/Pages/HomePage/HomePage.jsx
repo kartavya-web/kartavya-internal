@@ -92,8 +92,8 @@ const HomePage = () => {
   return (
     <>
       <header id="home" className="relative">
-        <div className="w-[22%] ml-[10rem] max-xl:ml-[4rem] max-xl:w-[28%] max-md:ml-6 max-md:w-[40%] max-sm:w-[55%]">
-          <img src="/kartavya_logo.png" alt="Kartavya Logo" />
+        <div className="ml-4 w-[55%] max-[360px]:ml-3 max-[360px]:w-[42%] sm:ml-6 sm:w-[40%] xl:ml-[10rem] xl:w-[22%]">
+            <img src="/kartavya_logo.png" alt="Kartavya Logo" className="max-[360px]:w-auto" />
         </div>
 
         <Button
@@ -105,6 +105,7 @@ const HomePage = () => {
             max-[500px]:h-10 max-[500px]:text-[0.9rem]
             max-[700px]:top-6 max-[700px]:right-6
             max-[500px]:top-4 max-[500px]:right-4
+            max-[360px]:top-3 max-[360px]:right-3 max-[360px]:w-auto max-[360px]:px-3
             rounded-[20px] font-bold
             flex items-center justify-center gap-2 z-20
             [&>svg]:w-7 [&>svg]:h-7
@@ -125,12 +126,11 @@ const HomePage = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 1 }}
             viewport={{ once: true }}
-            className="ml-[8%] flex flex-col text-[95px]
+            className="ml-[8%] flex flex-col text-[clamp(2.25rem,7vw,5.9375rem)]
               max-[1300px]:text-[70px]
               max-[1025px]:text-[50px]
-              max-[767px]:text-[80px]
-              max-[500px]:text-[60px]
-              max-[300px]:text-[25px]
+              max-[767px]:text-[clamp(2.25rem,12vw,5rem)]
+              max-[500px]:text-[clamp(1.5rem,10vw,3rem)]
               max-sm:ml-6 max-sm:mt-4"
           >
             <span className="font-bold leading-[0.9]">Internal</span>
@@ -140,14 +140,14 @@ const HomePage = () => {
         </div>
 
         <div
-          className="ml-[8%] mt-[6%] flex gap-6
+            className="ml-[8%] mt-[6%] flex flex-wrap gap-4
             max-[767px]:justify-center
             max-[767px]:ml-0
             max-[767px]:gap-[20vw]
             max-[530px]:gap-20
             max-[430px]:gap-10
             max-[360px]:flex-col
-            max-[360px]:px-[30vw] max-[360px]:gap-5"
+            max-[360px]:items-center max-[360px]:px-4 max-[360px]:gap-3"
         >
           <Button
             className=" rounded-lg font-bold px-10 py-5 text-[1.1rem]
@@ -209,10 +209,10 @@ const HomePage = () => {
         <div className="relative w-full mt-[10%]">
           <img src="/Hero.png" alt="Hero" className="w-full h-auto" />
           <div
-            className="absolute top-[38%] left-[8%]
-              max-w-[22vw] max-h-[196px]
-              font-bold font-garamond
-              text-[2.5vw]
+            className="absolute left-[6%] top-[30%] max-w-[42%] rounded-lg bg-white/85 p-2 shadow-sm
+              sm:left-[8%] sm:top-[38%] sm:max-w-[30vw] lg:max-w-[22vw] max-h-[196px]
+              font-bold font-garamond sm:rounded-none sm:bg-transparent sm:p-0 sm:shadow-none
+              text-[clamp(0.85rem,2.5vw,2rem)]
               leading-tight"
           >
             Empowering students through continuous monitoring and personalized
@@ -225,7 +225,7 @@ const HomePage = () => {
             Welcome to the Dashboard
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center w-full px-[15vw]">
+          <div className="grid w-full grid-cols-1 justify-items-center gap-5 px-4 sm:grid-cols-2 sm:px-8 lg:grid-cols-3 lg:gap-8 lg:px-[10vw]">
             {cards.map((card, index) => (
               <div
                 key={index}
@@ -279,7 +279,7 @@ const HomePage = () => {
         </div>
 
         <div className="flex flex-col justify-center">
-          <h2 className="text-[56px] font-bold mb-8 max-[900px]:text-[42px]">
+          <h2 className="text-[56px] font-bold mb-8 max-[900px]:text-[42px] max-[500px]:text-[clamp(1.5rem,8vw,2.625rem)]">
             About Us
           </h2>
           <p className=" text-[1.6rem] leading-relaxed font-playpen">

@@ -99,24 +99,24 @@ const DonationPipeline = () => {
   return (
     <div className="min-h-screen bg-gray-50/50 flex flex-col">
       {/* Top Header */}
-      <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm px-6 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white px-3 py-3 shadow-sm sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Logo Section */}
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logos.png" alt="Kartavya Logo" className="h-10 w-auto object-contain" />
+            <img src="/logos.png" alt="Kartavya Logo" className="h-9 w-auto object-contain" />
           </Link>
 
           {/* Title Section */}
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+          <h1 className="text-center text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
             Donation Pipeline
           </h1>
 
           {/* Actions Section */}
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-3">
             <Button 
               variant="outline" 
               size="sm"
-              className="gap-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold"
+              className="flex-1 gap-2 border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 sm:flex-none"
               onClick={fetchDonations}
             >
               Refresh List
@@ -124,7 +124,7 @@ const DonationPipeline = () => {
             <Button 
               variant="default"
               size="sm"
-              className="gap-2 bg-[#025f43] hover:bg-[#1a604a] text-white font-semibold"
+              className="flex-1 gap-2 bg-[#025f43] font-semibold text-white hover:bg-[#1a604a] sm:flex-none"
               onClick={() => navigate("/")}
             >
               ← Back to Home
@@ -134,15 +134,15 @@ const DonationPipeline = () => {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-8">
-        <div className="max-w-6xl mx-auto w-full space-y-12">
+      <main className="flex-1 p-3 sm:p-6 lg:p-8">
+        <div className="mx-auto w-full max-w-6xl space-y-6 sm:space-y-12">
           {donationGroups.length > 0 ? (
             donationGroups.map((group) => (
               <div key={group.userId} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 {/* Sponsor Header Card */}
-                <div className="p-6 border-b border-slate-100 bg-white">
+                <div className="border-b border-slate-100 bg-white p-4 sm:p-6">
                   <h3 className="text-xl font-bold text-slate-800 mb-4">{group.userName}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email</p>
                       <p className="text-sm text-slate-600 truncate">{group.userEmail}</p>

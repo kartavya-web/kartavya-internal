@@ -90,7 +90,7 @@ export default function Sponsors() {
       {/* Navbar removed as requested; keep top spacing */}
       <div className="h-6" />
 
-      <div className="flex justify-center mt-10 mb-8 gap-4 px-10">
+      <div className="mt-6 mb-6 flex flex-col justify-center gap-3 px-3 sm:mt-10 sm:mb-8 sm:flex-row sm:items-center sm:gap-4 sm:px-6 lg:px-10">
         <div className="relative w-full max-w-xl">
           <Input
             value={query}
@@ -105,14 +105,14 @@ export default function Sponsors() {
           disabled={isRefreshing}
           variant="outline"
           size="sm"
-          className="gap-2"
+          className="w-full gap-2 sm:w-auto"
         >
           <RotateCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
 
-      <div className="space-y-6 px-10 pb-10">
+      <div className="space-y-4 px-3 pb-6 sm:space-y-6 sm:px-6 sm:pb-10 lg:px-10">
         {loading ? (
           <div className="py-20">
             <Loader />

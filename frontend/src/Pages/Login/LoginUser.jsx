@@ -52,17 +52,17 @@ export default function LoginUser() {
   };
 
   return (
-    <div className="w-full p-5 h-screen flex flex-col items-center gap-10">
+    <div className="flex min-h-screen w-full flex-col items-center gap-6 p-4 sm:gap-10 sm:p-5">
       <div className="logo">
         <img
           src="/kartavya_logo.png"
           alt="kartavya logo"
-          className="h-[200px] object-cover"
+          className="h-36 object-contain sm:h-[200px]"
         ></img>
       </div>
       <form
         onSubmit={handleSubmit}
-        className="w-full sm:w-[450px] border shadow-lg rounded-lg p-5"
+        className="w-full max-w-[450px] rounded-lg border p-4 shadow-lg sm:p-5"
       >
         <h1 className="text-2xl font-semibold mb-6 text-center">Login</h1>
 
