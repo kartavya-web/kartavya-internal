@@ -70,7 +70,14 @@ const AllotChild = () => {
           }),
         });
         const data = await response.json();
-        toast.success(data.message);
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to allot child.");
+        }
+        if (data.emailSent === false) {
+          toast.warn("Child allotted, but the confirmation email could not be sent.");
+        } else {
+          toast.success(data.message);
+        }
         navigate("/allotment");
       } catch (error) {
         toast.error(error.message);

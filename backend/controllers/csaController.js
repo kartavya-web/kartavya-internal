@@ -7,81 +7,76 @@ const { sendEmail } = require("../Utils/mailer");
 const Donation = require("./../models/Donation");
 const ExcelJS = require("exceljs");
 
-// @route GET/api/allotment/
-const getVerifiedDonations = asyncHandler(async (req, res) => {
-  const now = new Date();
+const getCurrentAcademicYear = (now = new Date()) => {
   const year = now.getFullYear();
   const month = now.getMonth();
 
-  const currentAcademicYear =
-    month >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+  return month >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+};
+
+const verifiedDonationsForYear = (academicYear) => ({
+  path: "donations",
+  match: { verified: true, rejected: false, academicYear },
+  select: "donationDate numChild",
+  options: { sort: { donationDate: -1 } },
+});
+
+const getSponsorshipCounts = (sponsor) => {
+  const totalNumChild = sponsor.donations.reduce(
+    (sum, donation) => sum + (donation.numChild || 0),
+    0
+  );
+  const currentSponsored = sponsor.sponsoredStudents?.length ?? 0;
+
+  return {
+    totalNumChild,
+    currentSponsored,
+    pendingAllotment: totalNumChild - currentSponsored,
+  };
+};
+
+// @route GET/api/allotment/
+const getVerifiedDonations = asyncHandler(async (req, res) => {
+  const currentAcademicYear = getCurrentAcademicYear();
 
   const users = await User.find()
-    .populate({
-      path: "donations",
-      match: {
-        verified: true,
-        rejected: false,
-        academicYear: currentAcademicYear,
-      },
-      select: "donationDate numChild amount academicYear",
-      options: {
-        sort: { donationDate: -1 },
-      },
-    })
+    .populate(verifiedDonationsForYear(currentAcademicYear))
     .select("name email contactNumber sponsoredStudents donations")
     .lean();
 
   const verifiedDonations = users
     .filter((user) => user.donations && user.donations.length > 0)
-    .map((user) => {
-      const totalNumChild = user.donations.reduce(
-        (sum, d) => sum + (d.numChild || 0),
-        0
-      );
-
-      const currentSponsored = user.sponsoredStudents
-        ? user.sponsoredStudents.length
-        : 0;
-
-      const pendingAllotment = totalNumChild - currentSponsored;
-
-      // Latest verified donation date
-      const latestDonationDate = user.donations[0]?.donationDate || null;
-
-      return {
-        user: user._id,
-        name: user.name || "",
-        email: user.email || "",
-        contactNumber: user.contactNumber || "",
-        totalNumChild,
-        currentSponsored,
-        pendingAllotment,
-        latestDonationDate,
-        academicYear: currentAcademicYear,
-      };
-    })
+    .map((user) => ({
+      user: user._id,
+      name: user.name || "",
+      email: user.email || "",
+      contactNumber: user.contactNumber || "",
+      ...getSponsorshipCounts(user),
+      latestDonationDate: user.donations[0]?.donationDate || null,
+      academicYear: currentAcademicYear,
+    }))
     .filter((entry) => entry.pendingAllotment > 0);
 
   res.json(verifiedDonations);
 });
 
+const availableStudentFilter = {
+  sponsorshipStatus: true,
+  $expr: {
+    $gt: [
+      {
+        $multiply: ["$annualFees", { $divide: ["$sponsorshipPercent", 100] }],
+      },
+      { $multiply: [{ $size: { $ifNull: ["$sponsorId", []] } }, 8500] },
+    ],
+  },
+};
+
 // @route GET /api/allotment/action
 // @route GET /api/allotment/available
 const getChildTobeAlloted = asyncHandler(async (req, res) => {
   const sponsorid = req.headers["sponsorid"];
-
-  const query = {
-    sponsorshipStatus: true,
-    $expr: {
-      $gt: [
-        {
-          $multiply: ["$annualFees", { $divide: ["$sponsorshipPercent", 100] }],
-        },
-        { $multiply: [{ $size: "$sponsorId" }, 8500] },
-      ],
-    },
-  };
+  const query = { ...availableStudentFilter };
 
   if (sponsorid) {
     query.sponsorId = { $not: { $in: [sponsorid] } };
@@ -97,7 +92,7 @@ const getChildTobeAlloted = asyncHandler(async (req, res) => {
   });
 });
 
-const sendAllotmentEmail = async (sponsor, student) => {
+const sendAllotmentEmail = async (sponsor) => {
   const emailTemplate = generateEmailTemplate({
     title: "Child Allotment Confirmation - Kartavya IIT(ISM)",
     message: `Hello ${sponsor.name}, Thank you for choosing to sponsor a child. We have allotted you a child to support through our platform.`,
@@ -124,108 +119,113 @@ const sendAllotmentEmail = async (sponsor, student) => {
 // @route PATCH /api/allotment/allot
 const allotChild = asyncHandler(async (req, res) => {
   const { sponsorId, studentId } = req.body;
+  if (!sponsorId || !studentId) {
+    return res.status(400).json({ message: "Sponsor and student are required." });
+  }
 
   try {
-    const sponsor = await User.findById(sponsorId);
-    if (!sponsor) {
-      return res.status(404).json({ message: "Sponsor not found" });
-    }
+    const academicYear = getCurrentAcademicYear();
+    const result = await User.db.transaction(async (session) => {
+      const sponsor = await User.findById(sponsorId)
+        .select("name email donations sponsoredStudents")
+        .session(session)
+        .populate(verifiedDonationsForYear(academicYear));
+      if (!sponsor) {
+        return { status: 404, message: "Sponsor not found" };
+      }
 
-    const student = await Student.findById(studentId);
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
+      const student = await Student.findById(studentId).session(session);
+      if (!student) {
+        return { status: 404, message: "Student not found" };
+      }
 
-    const donationObject = await ChildSponsorMap.findOne({
-      user: sponsorId,
+      if (student.sponsorId.includes(sponsorId)) {
+        return {
+          status: 409,
+          message: "Student is already allotted to this sponsor.",
+        };
+      }
+
+      if (getSponsorshipCounts(sponsor).pendingAllotment <= 0) {
+        return {
+          status: 409,
+          message: "This sponsor has no remaining verified allotments for the current academic year.",
+        };
+      }
+
+      const isAvailable = await Student.exists({
+        _id: student._id,
+        ...availableStudentFilter,
+      }).session(session);
+      if (!isAvailable) {
+        return {
+          status: 409,
+          message: "This student is no longer available for allotment.",
+        };
+      }
+
+      sponsor.sponsoredStudents.addToSet(student._id);
+      await sponsor.save({ session });
+
+      student.sponsorId.addToSet(sponsor._id);
+      const history = student.sponsorshipHistory.find(
+        (entry) => entry.session === student.currentSession
+      );
+      if (history) {
+        history.sponsors.addToSet(sponsor._id);
+      } else {
+        student.sponsorshipHistory.push({
+          session: student.currentSession,
+          sponsors: [sponsor._id],
+        });
+      }
+      await student.save({ session });
+
+      // Keep existing map entries in sync when they cover a qualifying donation.
+      const donationIds = new Set(
+        sponsor.donations.map((donation) => donation._id.toString())
+      );
+      const map = await ChildSponsorMap.findOne({ user: sponsor._id })
+        .session(session);
+      const entry = map?.donations.find(
+        (donation) =>
+          donation.numChild > 0 && donationIds.has(donation.donationId?.toString())
+      );
+      if (entry) {
+        entry.numChild -= 1;
+        if (entry.numChild === 0) {
+          map.donations.pull(entry._id);
+        }
+        if (map.donations.length > 0) {
+          await map.save({ session });
+        } else {
+          await map.deleteOne({ session });
+        }
+      }
+
+      return { sponsor };
     });
 
-    if (!donationObject || donationObject.donations.length === 0) {
-      throw new Error("No donation record found for the sponsor.");
+    if (result.status) {
+      return res.status(result.status).json({ message: result.message });
     }
 
-    const firstDonation = donationObject.donations[0];
-    const numChild = firstDonation.numChild;
-
-    if (numChild <= 0) {
-      throw new Error("Invalid donation record: numChild is already zero.");
+    let emailSent = false;
+    try {
+      await sendAllotmentEmail(result.sponsor);
+      emailSent = true;
+    } catch (error) {
+      console.error("Allotment confirmation email failed:", error);
     }
 
-    if (student.sponsorId?.includes(sponsorId)) {
-      throw new Error("Student is already allotted to this sponsor.");
-    }
-
-    // Push studentId into the sponsoredStudents attribute of Sponsor
-    await User.updateOne(
-      { _id: sponsorId },
-      { $addToSet: { sponsoredStudents: studentId } },
-
-    );
-
-    // Push sponsorId into the sponsorId attribute of Student
-    student.sponsorId.addToSet(sponsorId);
-
-    const session = student.currentSession;
-
-    if (!student.sponsorshipHistory) {
-      student.sponsorshipHistory = [];
-    }
-
-    let history = student.sponsorshipHistory.find(
-      h => h.session === session
-    );
-
-    if (history) {
-      const alreadyExists = history.sponsors.some(
-        s => s.toString() === sponsorId.toString()
-      );
-
-      if (!alreadyExists) {
-        history.sponsors.push(sponsorId);
-      }
-    } else {
-      student.sponsorshipHistory.push({
-        session,
-        sponsors: [sponsorId]
-      });
-    }
-
-    await student.save();
-
-    // Decrement numChild in the first donation object
-    firstDonation.numChild -= 1;
-
-    if (firstDonation.numChild > 0) {
-      // Still children left in this donation → just save
-      await donationObject.save();
-    }
-    else if (firstDonation.numChild === 0) {
-      // Remove this donation from the array
-      donationObject.donations = donationObject.donations.filter(
-        (donation) =>
-          donation.donationId.toString() !== firstDonation.donationId.toString()
-      );
-
-      console.log(donationObject.donations, "Updated donations after removal");
-
-      if (donationObject.donations.length > 0) {
-        // Some donations still exist → save the reduced array
-        console.log("Saving donation object with reduced donations array");
-        await donationObject.save();
-      } else {
-        // No donations left → remove the entire document
-        console.log("Removing entire ChildSponsorMap document as no donations left");
-        await ChildSponsorMap.deleteOne({ _id: donationObject._id });
-      }
-    }
-
-    await sendAllotmentEmail(sponsor, student);
-    res.status(200).json({ message: "Child allotted successfully!" });
+    return res.status(200).json({
+      message: "Child allotted successfully!",
+      emailSent,
+    });
   } catch (error) {
     console.error("Allotment failed:", error);
-    res.status(400).json({
-      message:
-        error.message || "An error occurred during the allotment process.",
+    return res.status(400).json({
+      message: error.message || "An error occurred during the allotment process.",
     });
   }
 });
